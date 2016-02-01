@@ -1,0 +1,228 @@
+/*
+Outlines for debuggin	
+*/
+/*
+body, .container, #content, #content-level, #title{
+	
+	border: black;
+	border-bottom-width: 1px;
+	border-style: solid;
+}
+*/
+@font-face {
+	font-family:Kenzo;
+	src:url(../fonts/KenzoRegular.otf) format("opentype");
+}
+
+h1 {
+	font-family:'Kenzo',serif;
+	font-size:120px;
+}
+
+h2 {
+	font-family:'Kenzo',serif;
+	font-size:50px;
+}
+
+h3 {
+	font-family:'Kenzo',serif;
+	font-size:40px;
+}
+
+h4 {
+	font-family:'Kenzo',serif;
+	font-size:35px;
+}
+
+h5 {
+	font-family:'Kenzo',serif;
+	font-size:30px;
+}
+
+h6 {
+	font-family:'Kenzo',serif;
+	font-size:20px;
+}
+
+h1,h2,h3,h4,h5,h6 .marginless {
+	margin:0;
+}
+
+/*
+Colour Schemes	
+*/
+.orange {
+	color:#F57336;
+}
+
+.red {
+	color:#C22121;
+}
+
+.black {
+	color:#161616;
+}
+
+.blue {
+	color:#577DC3;
+}
+
+.white {
+	color:#fff;
+}
+
+/****************************************************************************************************
+START PAGE	
+****************************************************************************************************/
+body {
+	position:absolute;
+	top:0;
+	right:0;
+	bottom:0;
+	left:0;
+	display:-webkit-flex;
+	-webkit-align-items:center;
+	-webkit-flex-direction:row;
+	display:flex;
+	align-items:center;
+	flex-direction:row;
+}
+
+.container {
+	height:50%;
+	width:100%;
+	margin-left:20%;
+	margin-right:20%;
+}
+
+#title {
+	text-align:center;
+}
+
+#content {
+	position:relative;
+	height:200px;
+	max-width:750px;
+	margin:0 auto;
+	display:-webkit-flex;
+	-webkit-align-items:baseline;
+	-webkit-flex-direction:row;
+	display:flex;
+	align-items:baseline;
+	flex-direction:row;
+}
+
+#content-level {
+	width:50%;
+	height:100%;
+	display:-webkit-flex;
+	-webkit-align-items:center;
+	-webkit-flex-direction:column;
+	display:flex;
+	align-items:center;
+	flex-direction:column;
+}
+
+#content-level .selection {
+	height:50%;
+	display:-webkit-flex;
+	-webkit-align-items:center;
+	-webkit-flex-direction:row;
+	display:flex;
+	align-items:center;
+	flex-direction:row;
+	font-family:'Kenzo';
+	font-size:35px;
+}
+
+/* Hide the radio buttons so we can generate our own */
+input[type=radio] {
+	display:none;
+}
+
+input[type="radio"] + label span {
+	display:inline-block;
+	width:20px;
+	height:20px;
+	margin:-2px 15px 0 0;
+	vertical-align:middle;
+	border-radius:5px;
+	cursor:pointer;
+	background-color:#d7d7d7;
+}
+
+input[type="radio"]:checked + label span {
+	background-color:#577DC3;
+}
+
+#content-score {
+	flex:1;
+	display:-webkit-flex;
+	-webkit-align-items:center;
+	-webkit-flex-direction:column;
+	display:flex;
+	align-items:center;
+	flex-direction:column;
+}
+
+#content-score p {
+	font-family:'Kenzo',serif;
+	font-size:120px;
+	margin:0;
+}
+
+#start {
+	text-align:center;
+	width:100%;
+	padding-top:20px;
+}
+
+#start button {
+	width:100%;
+	max-width:550px;
+	padding-top:10px;
+	padding-bottom:3px;
+	vertical-align:middle;
+	border:none;
+	background-color:#577DC3;
+}
+
+/**********************************************************************************
+MEDIA QUERIES
+***********************************************************************************/
+/* for 980px or less */
+@media screen and (max-width: 980px) {
+	h1 {
+		font-size:110px;
+	}
+	
+	.container {
+		margin-left:10%;
+		margin-right:10%;
+	}
+}
+
+@media screen and (max-width: 700px) {
+	h1 {
+		font-size:90px;
+	}
+	
+	.container {
+		margin-left:5px;
+		margin-right:5px;
+	}
+	
+	#start button {
+		width:80%;
+	}
+}
+
+@media screen and (max-width: 480px) {
+	h1 {
+		font-size:70px;
+	}
+	
+	#start button {
+		width:90%;
+	}
+}

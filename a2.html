@@ -1,19 +1,44 @@
-<!doctype html>
+<!DOCTYPE html>
 
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+    <meta charset="utf-8">
 
-  <title>Tap Tap Bug</title>
-  <meta name="description" content="Assignment 2 for CSC309 @ UofT">
-  <meta name="author" content="Abbass-Ali Siwjee, Jeffrey Deng">
-
-
-  <link rel="stylesheet" href="css/style.css">
+    <title>Tap Tap Bug</title>
+    <meta name="description" content="Assignment 2 for CSC309 @ UofT">
+    <meta name="author" content="Abbass-Ali Siwjee, Jeffrey Deng">
+    <link rel="stylesheet" href="./css/style.css" type="text/css">
 </head>
 
 <body>
-	
-	
+    <div class="container">
+        <div id="title" class="orange">
+            <h1>TAP TAP BUG</h1>
+        </div>
+
+		<!-- Level and Highscore -->
+        <div id="content">
+            <div id="content-level">
+                <div class="selection">
+                    <input id="level1" type="radio" name="level-input" value="level1-value" checked="checked"> <label class="blue" for="level1">Level 1</label>
+                </div>
+
+                <div class="selection">
+                    <input id="level2" type="radio" name="level-input" value="level2-value"> <label class="blue" for="level2">Level 2</label>
+                </div>
+            </div>
+
+            <div id="content-score" class="blue">
+                <h4>HIGH SCORE</h4>
+
+                <p>60</p>
+            </div>
+        </div>
+
+        <div id="start">
+            <button type="button">
+            <h4 class="white">Start</h4></button>
+        </div>
+    </div>
 </body>
 </html>
