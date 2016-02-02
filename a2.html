@@ -10,8 +10,9 @@
     <link rel="stylesheet" href="./css/style.css" type="text/css">
 </head>
 
-<body>
-    <div class="container">
+<body onload = "loadScore()">
+    <div class="container" id="main">
+        <canvas id="game" style="display: none;"> </canvas>
         <div id="title" class="orange">
             <h1>TAP TAP BUG</h1>
         </div>
@@ -29,16 +30,18 @@
             </div>
 
             <div id="content-score" class="blue">
-                <h4>HIGH SCORE</h4>
 
-                <p>60</p>
             </div>
         </div>
 
         <div id="start">
-            <button type="button">
+            <button type="button" onclick="startGame()">
             <h4 class="white">Start</h4></button>
         </div>
     </div>
 </body>
+
+<script src="tapTapBug.js"> </script>
+<!--THE BELOW SCRIPT HAS BEEN COPIED DIRECTLY FROM CLASS 3 NOTES (WITH CHANGE OF COLOUR PARAMETER) May change later on! -->
+<script src="bug.js"> </script>
 </html>
