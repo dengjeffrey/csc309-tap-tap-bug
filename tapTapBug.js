@@ -13,7 +13,7 @@ function startGame() {
 	var myTimer = setInterval(runTimer, 1000);
 
 	var timeToSpawn = randomize(1, 3);
-	var myVar = setInterval(playGame, timeToSpawn * 1000);
+	var spawnBugTimer = setInterval(playGame, timeToSpawn * 1000);
 	//var audio = document.getElementById("gameMusic");
     //audio.remove(audio);
 }
