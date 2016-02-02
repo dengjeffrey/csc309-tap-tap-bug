@@ -2,7 +2,6 @@ var TIMEPERLEVEL = 60;
 var score = 0;
 var canvas = document.getElementById("game");
 var context = canvas.getContext("2d");
-var currentCountDown;
 
 function startGame() {
     document.getElementById("main").innerHTML = "<canvas id='game' width = '400' height = '600'>  </canvas> <audio id ='gameMusic' controls autoplay loop hidden: true;> <source src='audio/PlantsVsZombies.mp3' type='audio/mpeg'> </audio>";
