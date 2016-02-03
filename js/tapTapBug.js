@@ -5,11 +5,23 @@ var canvas = document.getElementById("game");
 var context = canvas.getContext("2d");
 var bugs = [];
 
+// UI
+var CANVAS_WIDTH = 400;
+var CANVAS_HEIGHT = 600; 
+var MENU_BAR_HEIGHT = 50;
+
+// Colours
+
+var orange = "#F57336";
+var red = "#C22121";
+var black = "#161616";
+var blue = "#577DC3";
+
 function startGame() {
-    document.getElementById("main").innerHTML = "<canvas id='game' width = '400' height = '600'>  </canvas> <audio id ='gameMusic' controls autoplay loop hidden: true;> <source src='audio/PlantsVsZombies.mp3' type='audio/mpeg'> </audio>";
+    document.getElementById("main").innerHTML = "<canvas id='game' width = '" + CANVAS_WIDTH + "' height = '" + (CANVAS_HEIGHT + MENU_BAR_HEIGHT) + "'>  </canvas> <audio id ='gameMusic' controls autoplay loop hidden: true;> <source src='audio/PlantsVsZombies.mp3' type='audio/mpeg'> </audio>";
 	canvas = document.getElementById("game");
 	context = canvas.getContext("2d");
-	createMenu();
+	drawMenu();
 	
 	var myTimer = setInterval(runTimer, 1000);
 
@@ -19,14 +31,32 @@ function startGame() {
 	//var audio = document.getElementById("gameMusic");
     //audio.remove(audio);
 }
-function createMenu () {
-	context.globalAlpha=0.2;
-	context.fillStyle="blue"; 
-	context.fillRect(0,0,400,50);
+
+/* Drawings */
+
+// Draw loop
+function draw() {
+	context.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT + MENU_BAR_HEIGHT);
+	drawMenu();
+	drawTimer();
 }
 
-function playGame() {
+function drawMenu () {
+	context.globalAlpha = 1;
+	context.fillStyle = blue; 
+	context.fillRect(0, 0, CANVAS_WIDTH, MENU_BAR_HEIGHT);
+}
 
+function drawTimer() {
+	context.globalAlpha = 1;
+	context.fillStyle = "white"; 
+	context.font = "18px Kenzo";
+	context.fillText(TIMEPERLEVEL, 10, 35);
+}
+
+
+function playGame() {
+	draw();
 }
 
 function moveBugs() {
@@ -63,9 +93,11 @@ function spawnBug() {
 
 function runTimer() {
 	TIMEPERLEVEL--;
-	context.font = "18px Arial";
-	context.fillText(TIMEPERLEVEL, 10, 35);
 }
+
+
+
+
 /**
 * On load, html page will fetch the stored score
 **/
