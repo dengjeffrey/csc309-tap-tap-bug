@@ -1,7 +1,8 @@
 var TIMEPERLEVEL = 60;
-var score = 0;
+var score;
 var canvas = document.getElementById("game");
 var context = canvas.getContext("2d");
+var bugs = [];
 
 function startGame() {
     document.getElementById("main").innerHTML = "<canvas id='game' width = '400' height = '600'>  </canvas> <audio id ='gameMusic' controls autoplay loop hidden: true;> <source src='audio/PlantsVsZombies.mp3' type='audio/mpeg'> </audio>";
@@ -44,7 +45,9 @@ function playGame() {
 
 	//Cookie Testing:
 	score += 1;
-	setCookie("score", score, 100);
+	context.font = "18px Arial";
+	context.fillText(score, 50, 35);
+	setScore();
 
 
 }
@@ -58,26 +61,10 @@ function runTimer() {
 * On load, html page will fetch the stored score
 **/
 function loadScore() {
-	score = getCookie("score");
+	score = Number(localStorage.getItem("score"));
 	document.getElementById("content-score").innerHTML = "<h4>HIGH SCORE</h4> <p>" + score + "</p>"
 }
 
-
-//Taken from w3schools
-function setCookie(cname, cvalue, exdays) {
-    var d = new Date();
-    d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    var expires = "expires="+d.toUTCString();
-    document.cookie = cname + "=" + cvalue + "; " + expires;
-}
-
-function getCookie(cname) {
-    var name = cname + "=";
-    var ca = document.cookie.split(';');
-    for(var i=0; i<ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0)==' ') c = c.substring(1);
-        if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
-    }
-    return "";
+function setScore() {
+	localStorage.setItem("score", score);
 }
