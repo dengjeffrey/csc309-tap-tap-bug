@@ -15,35 +15,55 @@ var bugs = [];
 var fruits = ["apple", "banana", "watermelon", "orange", "grape"];
 var Level = 1;
 
+// UI
+var CANVAS_WIDTH = 400;
+var CANVAS_HEIGHT = 600; 
+var MENU_BAR_HEIGHT = 50;
+
+// Colours
+
+var orange = "#F57336";
+var red = "#C22121";
+var black = "#161616";
+var blue = "#577DC3";
+
 function startGame() {
-    document.getElementById("main").innerHTML = "<canvas id='game' width = '400' height = '600'>  </canvas> <audio id ='gameMusic' controls autoplay loop hidden: true;> <source src='audio/PlantsVsZombies.mp3' type='audio/mpeg'> </audio>";
+    document.getElementById("main").innerHTML = "<canvas id='game' width = '" + CANVAS_WIDTH + "' height = '" + (CANVAS_HEIGHT + MENU_BAR_HEIGHT) + "'>  </canvas> <audio id ='gameMusic' controls autoplay loop hidden: true;> <source src='audio/PlantsVsZombies.mp3' type='audio/mpeg'> </audio>";
 	canvas = document.getElementById("game");
 	context = canvas.getContext("2d");
 	initFruits();
-	createMenu();
 	beginTimers();
+	drawMenu();
 
 	//var audio = document.getElementById("gameMusic");
     //audio.remove(audio);
 }
+/* Drawings */
 
-function createMenu () {
-	context.globalAlpha=0.2;
-	context.fillStyle="blue"; 
-	context.fillRect(0,0,400,50);
-	context.font = "18px Arial";
-	context.fillText("Score: " + score, 310, 35);
-	context.font = "18px Arial";
-	context.fillText("Time Left: " + timeLeft, 10, 35);
+// Draw loop
+function draw() {
+	context.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT + MENU_BAR_HEIGHT);
+	drawMenu();
+	drawTimer();
+	moveBugs();
+	spawnFruits();
 }
 
+function drawMenu () {
+	context.globalAlpha = 1;
+	context.fillStyle = blue; 
+	context.fillRect(0, 0, CANVAS_WIDTH, MENU_BAR_HEIGHT);
+}
+
+function drawTimer() {
+	context.globalAlpha = 1;
+	context.fillStyle = "white"; 
+	context.font = "18px Kenzo";
+	context.fillText(timeLeft, 10, 35);
+}
 
 function playGame() {
-	context.clearRect(0, 0, canvas.width, canvas.height);
-	moveBugs();
-	createMenu();
-	spawnFruits();
-
+	draw();
 }
 
 function beginTimers() {
