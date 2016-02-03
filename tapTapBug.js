@@ -1,5 +1,6 @@
 var TIMEPERLEVEL = 60;
-var score;
+var score = 0;
+var topScore;
 var canvas = document.getElementById("game");
 var context = canvas.getContext("2d");
 var bugs = [];
@@ -13,15 +14,23 @@ function startGame() {
 	var myTimer = setInterval(runTimer, 1000);
 
 	var timeToSpawn = randomize(1, 3);
-	var spawnBugTimer = setInterval(playGame, timeToSpawn * 1000);
+	var mainGameTimer = setInterval(playGame, 1000/25);
+	var spawnBugTimer = setInterval(spawnBug, timeToSpawn * 1000);
 	//var audio = document.getElementById("gameMusic");
     //audio.remove(audio);
 }
-
 function createMenu () {
 	context.globalAlpha=0.2;
 	context.fillStyle="blue"; 
 	context.fillRect(0,0,400,50);
+}
+
+function playGame() {
+
+}
+
+function moveBugs() {
+
 }
 
 function randomize(lowest, highest) {
@@ -29,7 +38,7 @@ function randomize(lowest, highest) {
 	return number;
 }
 
-function playGame() {
+function spawnBug() {
 	var whereToSpawn = randomize(10, 390);
 	var colourOfAnt = randomize(1, 100);
 
@@ -61,10 +70,13 @@ function runTimer() {
 * On load, html page will fetch the stored score
 **/
 function loadScore() {
-	score = Number(localStorage.getItem("score"));
-	document.getElementById("content-score").innerHTML = "<h4>HIGH SCORE</h4> <p>" + score + "</p>"
+	topScore = Number(localStorage.getItem("score"));
+	document.getElementById("content-score").innerHTML = "<h4>HIGH SCORE</h4> <p>" + topScore + "</p>"
 }
 
 function setScore() {
-	localStorage.setItem("score", score);
+	if (score > topScore) {
+		localStorage.setItem("score", score);
+	}
+	
 }
