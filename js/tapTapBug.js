@@ -157,7 +157,7 @@ function moveBugs() {
 		var fruitNumber = shortestDistance(i);
 		var x1 = bugs[i][3];
 		var y1 = bugs[i][4];
-		var x2 = fruits[fruitNumber][1];
+		var x2 = fruits[fruitNumber][1] + 6;
 		var y2 = fruits[fruitNumber][2];
 
 		if (x1 == x2) {
@@ -166,10 +166,20 @@ function moveBugs() {
 		} else if (y1 == y2) {
 			yTranslation = 0;
 			xTranslation = bugs[i][1];
+
+			if (x2 < x1) {
+				xTranslation = -xTranslation;
+			}
 		} else {
 			var distanceAngle = Math.atan((x2-x1)/(y2-y1));
 			xTranslation = bugs[i][1] * Math.sin(distanceAngle);
 			yTranslation = bugs[i][1] * Math.cos(distanceAngle);
+		}
+
+		
+
+		if (y2 < y1) {
+			yTranslation = -yTranslation;
 		}
 
 		bugs[i][3] = bugs[i][3] + xTranslation;
@@ -180,7 +190,8 @@ function moveBugs() {
 }
 
 function randomize(lowest, highest) {
-	var number = Math.floor((Math.random() * highest) + lowest);
+	var high = highest - lowest;
+	var number = Math.floor((Math.random() * high) + lowest);
 	return number;
 }
 
@@ -238,7 +249,7 @@ function initFruits() {
 
 	for (var i = 0; i < 5; i++) {
 		xPosition = randomize(10, 350);
-		yPosition = randomize(150, 530);
+		yPosition = randomize(150, 570);
 		var image = document.getElementById(fruits[i]);
 
 		//Replace fruit name in array with array detailing image name, alpha/visibility, xPosition and yPosition
