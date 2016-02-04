@@ -1,5 +1,6 @@
 var canvas = document.getElementById("game");
 var context = canvas.getContext("2d");
+const AUDIO_ELEMENT_ID = "gameMusic";
 
 const FPS = 60;
 
@@ -15,7 +16,6 @@ var bugs = [];
 var fruits = ["apple", "banana", "watermelon", "orange", "grape"];
 var Level = 1;
 
-
 // Timers
 var countdownTimer;
 var mainGameTimer;
@@ -23,13 +23,14 @@ var addBugTimer;
 
 // Button states
 var isPaused = Boolean(false);
-
+var isMute = Boolean(false);
 
 //////////////////////////////////////////
 // UI
 //////////////////////////////////////////
 const CANVAS_WIDTH = 400;
 const CANVAS_HEIGHT = 600; 
+const CANVAS_MARGIN = 30;
 
 // Menu
 const MENU_BAR_HEIGHT = 50;
@@ -44,6 +45,21 @@ const PAUSE_BUTTON_GAP = 10;
 const PAUSE_BUTTON_X = CANVAS_WIDTH/2 - PAUSE_BUTTON_WIDTH/2;
 const PAUSE_BUTTON_Y = MENU_BAR_HEIGHT/2 - PAUSE_BUTTON_HEIGHT/2;
 
+// Mute
+const MUTE_TOTAL_WIDTH = 28;
+const MUTE_SPEAKER_WIDTH = 18;
+const MUTE_SPEAKER_END_WIDTH = 9;
+const MUTE_TOTAL_HEIGHT = 24;
+const MUTE_SPEAKER_END_HEIGHT = 12;
+	
+const MUTE_BUTTON_X = CANVAS_WIDTH - MUTE_TOTAL_WIDTH - CANVAS_MARGIN; 
+const MUTE_BUTTON_Y = CANVAS_HEIGHT + MENU_BAR_HEIGHT - MUTE_TOTAL_HEIGHT - CANVAS_MARGIN; 
+	
+const SMALL_MUTEBAR_HEIGHT = MUTE_TOTAL_HEIGHT * 0.4;
+const LARGE_MUTEBAR_HEIGHT = MUTE_TOTAL_HEIGHT * 0.8;
+const MUTE_BAR_WIDTH = 2;
+const MUTE_BAR_SPACING = 3;
+
 // Colours
 const ORANGE = "#F57336";
 const RED = "#C22121";
@@ -51,7 +67,7 @@ const BLACK = "#161616";
 const BLUE = "#577DC3";
 
 function startGame() {
-    document.getElementById("main").innerHTML = "<canvas id='game' width = '" + CANVAS_WIDTH + "' height = '" + (CANVAS_HEIGHT + MENU_BAR_HEIGHT) + "'>  </canvas> <audio id ='gameMusic' controls autoplay loop hidden: true;> <source src='audio/PlantsVsZombies.mp3' type='audio/mpeg'> </audio>";
+    document.getElementById("main").innerHTML = "<canvas id='game' width = '" + CANVAS_WIDTH + "' height = '" + (CANVAS_HEIGHT + MENU_BAR_HEIGHT) + "'>  </canvas> <audio id ='" + AUDIO_ELEMENT_ID + "' controls autoplay loop hidden: true;> <source src='audio/PlantsVsZombies.mp3' type='audio/mpeg'> </audio>";
 	canvas = document.getElementById("game");
 	
 	// Add Mouse down listener
@@ -70,9 +86,6 @@ function startGame() {
 		redSpeed = 75;
 		orangeSpeed = 60;
 	}
-
-	//var audio = document.getElementById("gameMusic");
-    //audio.remove(audio);
 }
 /* Drawings */
 
@@ -131,11 +144,44 @@ function drawPausedOverlay() {
 	context.fillStyle = "black";
 	context.fillRect(0, MENU_BAR_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT);
 	
+	context.globalAlpha = 1;	
 	context.fillStyle = "white";
 	context.font = "60px Kenzo";
 	
 	var pauseTextWidth = context.measureText(PAUSE_TEXT).width;
 	context.fillText(PAUSE_TEXT, (CANVAS_WIDTH - pauseTextWidth)/2, CANVAS_HEIGHT/2);
+	
+	drawMute();
+}
+
+function drawMute() {
+	context.globalAlpha = 1;	
+	context.fillStyle="white";
+	
+	if (isMute) {
+		context.fillStyle="black";
+	}
+
+	context.fillRect(MUTE_BUTTON_X + MUTE_SPEAKER_WIDTH + MUTE_BAR_SPACING, MUTE_BUTTON_Y + (MUTE_TOTAL_HEIGHT - SMALL_MUTEBAR_HEIGHT)/2, MUTE_BAR_WIDTH, SMALL_MUTEBAR_HEIGHT);
+	context.fillRect(MUTE_BUTTON_X + MUTE_SPEAKER_WIDTH + 2*MUTE_BAR_SPACING + MUTE_BAR_WIDTH, MUTE_BUTTON_Y + (MUTE_TOTAL_HEIGHT - LARGE_MUTEBAR_HEIGHT)/2, MUTE_BAR_WIDTH, LARGE_MUTEBAR_HEIGHT);
+
+	context.fillStyle="white";
+	context.lineWidth=2;
+	context.beginPath();
+	context.moveTo(MUTE_BUTTON_X, MUTE_BUTTON_Y + (MUTE_TOTAL_HEIGHT - MUTE_SPEAKER_END_HEIGHT)/2);
+	context.lineTo(MUTE_BUTTON_X, MUTE_BUTTON_Y + (MUTE_TOTAL_HEIGHT - MUTE_SPEAKER_END_HEIGHT)/2 + MUTE_SPEAKER_END_HEIGHT);
+
+	// Diagonal
+	context.lineTo(MUTE_BUTTON_X + MUTE_SPEAKER_END_WIDTH, MUTE_BUTTON_Y + (MUTE_TOTAL_HEIGHT - MUTE_SPEAKER_END_HEIGHT)/2 + MUTE_SPEAKER_END_HEIGHT);
+
+	context.lineTo(MUTE_BUTTON_X + MUTE_SPEAKER_WIDTH, MUTE_BUTTON_Y + MUTE_TOTAL_HEIGHT);
+	context.lineTo(MUTE_BUTTON_X + MUTE_SPEAKER_WIDTH, MUTE_BUTTON_Y);
+
+	// Diagonal
+	context.lineTo(MUTE_BUTTON_X + MUTE_SPEAKER_END_WIDTH, MUTE_BUTTON_Y + (MUTE_TOTAL_HEIGHT - MUTE_SPEAKER_END_HEIGHT)/2);
+	context.lineTo(MUTE_BUTTON_X, MUTE_BUTTON_Y + (MUTE_TOTAL_HEIGHT - MUTE_SPEAKER_END_HEIGHT)/2);
+	context.moveTo(MUTE_BUTTON_X, MUTE_BUTTON_Y + (MUTE_TOTAL_HEIGHT - MUTE_SPEAKER_END_HEIGHT)/2);
+	context.fill();
 }
 
 function drawTimer() {
@@ -366,6 +412,23 @@ function mouseDidPressDown(event) {
 		} else {
 			isPaused = Boolean(true);
 			pauseGame();
+		}
+	}
+	
+	if(isPaused && isPointInRect(MUTE_BUTTON_X, MUTE_BUTTON_Y, MUTE_TOTAL_WIDTH, MUTE_TOTAL_HEIGHT, mousePosition.x, mousePosition.y)) {
+		console.log("PRESS");
+		if (isMute) {
+			isMute = Boolean(false);
+			//audio.muted = false;
+			document.getElementById(AUDIO_ELEMENT_ID).muted = false;
+
+			drawMute();
+		} else {
+			isMute = Boolean(true);
+			//audio.muted = true;
+			document.getElementById(AUDIO_ELEMENT_ID).muted = true;
+
+			drawMute();
 		}
 	}
 	
