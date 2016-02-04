@@ -15,6 +15,16 @@ var bugs = [];
 var fruits = ["apple", "banana", "watermelon", "orange", "grape"];
 var Level = 1;
 
+
+// Timers
+var countdownTimer;
+var mainGameTimer;
+var addBugTimer;
+
+// Button states
+var isPaused = Boolean(false);
+
+
 //////////////////////////////////////////
 // UI
 //////////////////////////////////////////
@@ -27,6 +37,7 @@ const MENU_BAR_HORIZONTAL_MARGIN = 10;
 const MENU_BAR_VERTICAL_MARGIN = 20;
 
 // Pause
+const PAUSE_TEXT = "PAUSED";
 const PAUSE_BUTTON_WIDTH = 24;
 const PAUSE_BUTTON_HEIGHT = 24;
 const PAUSE_BUTTON_GAP = 10; 
@@ -42,10 +53,16 @@ const BLUE = "#577DC3";
 function startGame() {
     document.getElementById("main").innerHTML = "<canvas id='game' width = '" + CANVAS_WIDTH + "' height = '" + (CANVAS_HEIGHT + MENU_BAR_HEIGHT) + "'>  </canvas> <audio id ='gameMusic' controls autoplay loop hidden: true;> <source src='audio/PlantsVsZombies.mp3' type='audio/mpeg'> </audio>";
 	canvas = document.getElementById("game");
+	
+	// Add Mouse down listener
+	canvas.addEventListener("mousedown", mouseDidPressDown, false);
+	canvas.addEventListener("mouseup", mouseDidRelease, false);
+
+	
 	context = canvas.getContext("2d");
 	initFruits();
 	beginTimers();
-	drawMenu();
+	
 
 	if (document.getElementById('level2').checked == true || Level == 2)  {
 		Level = 2;
@@ -62,8 +79,8 @@ function startGame() {
 // Draw loop
 function draw() {
 	context.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT + MENU_BAR_HEIGHT);
+	
 	drawMenu();
-
 	moveBugs();
 	spawnFruits();
 }
@@ -82,17 +99,43 @@ function drawMenu () {
 }
 
 function drawPause() {
-			
-	const BAR_WIDTH = PAUSE_BUTTON_WIDTH/2 - PAUSE_BUTTON_GAP/2;
-			
-	context.globalAlpha = 1;
-	context.fillStyle = "white";
-	context.fillRect(PAUSE_BUTTON_X, PAUSE_BUTTON_Y, BAR_WIDTH, PAUSE_BUTTON_HEIGHT);
 	
-	context.fillRect(PAUSE_BUTTON_X + BAR_WIDTH + PAUSE_BUTTON_GAP/2, 
-					 PAUSE_BUTTON_Y, 
-					 BAR_WIDTH, 
-					 PAUSE_BUTTON_HEIGHT);	
+	// Pause button	
+	if (!isPaused) {
+		const BAR_WIDTH = PAUSE_BUTTON_WIDTH/2 - PAUSE_BUTTON_GAP/2;
+		
+		context.globalAlpha = 1;
+		context.fillStyle = "white";
+		context.fillRect(PAUSE_BUTTON_X, PAUSE_BUTTON_Y, BAR_WIDTH, PAUSE_BUTTON_HEIGHT);
+	
+		context.fillRect(PAUSE_BUTTON_X + BAR_WIDTH + PAUSE_BUTTON_GAP/2, 
+						 PAUSE_BUTTON_Y, 
+						 BAR_WIDTH, 
+						 PAUSE_BUTTON_HEIGHT);	
+	}
+	// Play button
+	else {
+		context.globalAlpha = 1;
+		context.fillStyle = "white";
+		context.beginPath();
+		context.moveTo(PAUSE_BUTTON_X, PAUSE_BUTTON_Y);
+		context.lineTo(PAUSE_BUTTON_X, PAUSE_BUTTON_Y + PAUSE_BUTTON_HEIGHT);
+		context.lineTo(PAUSE_BUTTON_X + PAUSE_BUTTON_WIDTH, PAUSE_BUTTON_Y + PAUSE_BUTTON_HEIGHT/2);
+	    context.fill();
+	}
+}
+
+function drawPausedOverlay() {
+	
+	context.globalAlpha = 0.8;
+	context.fillStyle = "black";
+	context.fillRect(0, MENU_BAR_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT);
+	
+	context.fillStyle = "white";
+	context.font = "60px Kenzo";
+	
+	var pauseTextWidth = context.measureText(PAUSE_TEXT).width;
+	context.fillText(PAUSE_TEXT, (CANVAS_WIDTH - pauseTextWidth)/2, CANVAS_HEIGHT/2);
 }
 
 function drawTimer() {
@@ -139,15 +182,18 @@ function playGame() {
 function beginTimers() {
 	var timeToSpawn = randomize(1, 3);
 	
-	var countdownTimer = setInterval(runTimer, 1000);
-	var mainGameTimer = setInterval(playGame, 1000/FPS);
-	var addBugTimer = setInterval(addBug, timeToSpawn * 1000);
+	countdownTimer = setInterval(runTimer, 1000);
+	mainGameTimer = setInterval(playGame, 1000/FPS);
+	addBugTimer = setInterval(addBug, timeToSpawn * 1000);
 }
 
 function pauseGame() {
 	window.clearTimeout(mainGameTimer);
 	window.clearTimeout(addBugTimer);
 	window.clearTimeout(countdownTimer);
+	
+	drawMenu ();
+	drawPausedOverlay();
 }
 
 function moveBugs() {
@@ -272,3 +318,50 @@ function setScore() {
 	}
 	
 }
+
+/* Given a rectangle, and a point. True if point resides in rectangle */
+function isPointInRect(rectX, rectY, rectWidth, rectHeight, pointX, pointY) {
+	
+	if (pointX >= rectX && pointX <= rectX + rectWidth &&
+		pointY >= rectY && pointY <= rectY + rectHeight) {
+		return Boolean(true);
+	} else {
+		return Boolean(false);
+	}
+	
+}
+
+/* Pass the event.clientX and event.clientY from a mouse press event other wise pass two x and y coordinates to convert them to x and y relative to the canvas */
+function mousePositionInCanvas(mouseX, mouseY) {
+	
+	var canvasRect = canvas.getBoundingClientRect();
+	
+	return {
+		x: (mouseX-canvasRect.left)/(canvasRect.right - canvasRect.left) * canvas.width,
+		y: (mouseY-canvasRect.top)/(canvasRect.bottom - canvasRect.top) * canvas.height
+	};
+}
+
+/* Delegate Event listeners */
+function mouseDidPressDown(event) {
+	
+	var mousePosition = mousePositionInCanvas(event.clientX, event.clientY);
+
+	if(isPointInRect(PAUSE_BUTTON_X, PAUSE_BUTTON_Y, PAUSE_BUTTON_WIDTH, PAUSE_BUTTON_HEIGHT, mousePosition.x, mousePosition.y)) {
+		
+		if (isPaused) {
+			isPaused = Boolean(false);
+			beginTimers();
+		} else {
+			isPaused = Boolean(true);
+			pauseGame();
+		}
+	}
+	
+}
+
+function mouseDidRelease(event) {
+	
+}
+
+
