@@ -1,15 +1,15 @@
 var canvas = document.getElementById("game");
 var context = canvas.getContext("2d");
 
-const FPS = 45;
+const FPS = 60;
 
 var timeLeft = 60;
 var topScore;
 var score = 0;
 
-var blackSpeed = 150/FPS;
-var redSpeed = 75/FPS;
-var orangeSpeed = 60/FPS; 
+var blackSpeed = 150;
+var redSpeed = 75;
+var orangeSpeed = 60; 
 
 var bugs = [];
 var fruits = ["apple", "banana", "watermelon", "orange", "grape"];
@@ -46,6 +46,13 @@ function startGame() {
 	initFruits();
 	beginTimers();
 	drawMenu();
+
+	if (document.getElementById('level2').checked == true || Level == 2)  {
+		Level = 2;
+		blackSpeed = 200;
+		redSpeed = 75;
+		orangeSpeed = 60;
+	}
 
 	//var audio = document.getElementById("gameMusic");
     //audio.remove(audio);
@@ -133,7 +140,7 @@ function beginTimers() {
 	var timeToSpawn = randomize(1, 3);
 	
 	var countdownTimer = setInterval(runTimer, 1000);
-	var mainGameTimer = setInterval(playGame, FPS);
+	var mainGameTimer = setInterval(playGame, 1000/FPS);
 	var addBugTimer = setInterval(addBug, timeToSpawn * 1000);
 }
 
@@ -145,7 +152,29 @@ function pauseGame() {
 
 function moveBugs() {
 	for (var i = 0; i < bugs.length; i++) {
-		bugs[i][4] = bugs[i][4] + bugs[i][1];
+		var xTranslation;
+		var yTranslation;
+		var fruitNumber = shortestDistance(i);
+		var x1 = bugs[i][3];
+		var y1 = bugs[i][4];
+		var x2 = fruits[fruitNumber][1];
+		var y2 = fruits[fruitNumber][2];
+
+		if (x1 == x2) {
+			xTranslation = 0;
+			yTranslation = bugs[i][1];
+		} else if (y1 == y2) {
+			yTranslation = 0;
+			xTranslation = bugs[i][1];
+		} else {
+			var distanceAngle = Math.atan((x2-x1)/(y2-y1));
+			xTranslation = bugs[i][1] * Math.sin(distanceAngle);
+			yTranslation = bugs[i][1] * Math.cos(distanceAngle);
+		}
+
+		bugs[i][3] = bugs[i][3] + xTranslation;
+		bugs[i][4] = bugs[i][4] + yTranslation;
+
 		makeBug(context, bugs[i][0], 0.5, bugs[i][3], bugs[i][4]);
 	}
 }
@@ -162,25 +191,45 @@ function addBug() {
 	var points;
 
 	if (colourOfAnt < 30) {
-		colourOfAnt = "#161616";
+		colourOfAnt = BLACK;
 		points = 5;
-		speed = blackSpeed;
+		speed = blackSpeed/FPS;
 	} else if (colourOfAnt < 60) {
-		colourOfAnt = "#C22121";
+		colourOfAnt = RED;
 		points = 3;
-		speed = redSpeed;
+		speed = redSpeed/FPS;
 	} else {
-		colourOfAnt = "#F57336";
+		colourOfAnt = ORANGE;
 		points = 1;
-		speed = orangeSpeed;
+		speed = orangeSpeed/FPS;
 	}
 
-	//Make an Array for the bug which has: colour, speed, visibility, points, x position, y position
-
+	//Make an Array for the bug which has: colour, speed, points, x position, y position
 	bugs.push([colourOfAnt, speed, points, whereToSpawn, 50]);
 	//Cookie Testing:
 	score += 1;
 	setScore();
+}
+
+
+function shortestDistance(bugNumber) {
+	var fruitNumber;
+	var lowest;
+
+	for (var i = 0; i < fruits.length; i++) {
+		var d = distance(fruits[i][1], fruits[i][2], bugs[bugNumber][3], bugs[bugNumber][4]);
+		if (d < lowest || lowest == null) {
+			fruitNumber = i;
+			lowest = d;
+		}
+	}
+
+	return fruitNumber;
+}
+
+function distance(x1, y1, x2, y2) {
+	var d = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+	return d;
 }
 
 function initFruits() {
