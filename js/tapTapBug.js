@@ -62,17 +62,21 @@ function startGame() {
 	context = canvas.getContext("2d");
 	initFruits();
 	beginTimers();
-	
-
-	if (document.getElementById('level2').checked == true || Level == 2)  {
-		Level = 2;
-		blackSpeed = 200;
-		redSpeed = 75;
-		orangeSpeed = 60;
-	}
 
 	//var audio = document.getElementById("gameMusic");
     //audio.remove(audio);
+}
+
+function selectLevel(number) {
+	if (number == 2)  {
+		blackSpeed = 200;
+		redSpeed = 100;
+		orangeSpeed = 80;
+	} else {
+		blackSpeed = 150;
+		redSpeed = 75;
+		orangeSpeed = 60; 
+	}
 }
 /* Drawings */
 
