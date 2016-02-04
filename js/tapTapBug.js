@@ -26,6 +26,13 @@ const MENU_BAR_HEIGHT = 50;
 const MENU_BAR_HORIZONTAL_MARGIN = 10;
 const MENU_BAR_VERTICAL_MARGIN = 20;
 
+// Pause
+const PAUSE_BUTTON_WIDTH = 24;
+const PAUSE_BUTTON_HEIGHT = 24;
+const PAUSE_BUTTON_GAP = 10; 
+const PAUSE_BUTTON_X = CANVAS_WIDTH/2 - PAUSE_BUTTON_WIDTH/2;
+const PAUSE_BUTTON_Y = MENU_BAR_HEIGHT/2 - PAUSE_BUTTON_HEIGHT/2;
+
 // Colours
 const ORANGE = "#F57336";
 const RED = "#C22121";
@@ -49,22 +56,41 @@ function startGame() {
 function draw() {
 	context.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT + MENU_BAR_HEIGHT);
 	drawMenu();
-	drawTimer();
-	drawScore();
 
 	moveBugs();
 	spawnFruits();
 }
 
 function drawMenu () {
+	
+	// Draw the bar itself
 	context.globalAlpha = 1;
 	context.fillStyle = BLUE; 
 	context.fillRect(0, 0, CANVAS_WIDTH, MENU_BAR_HEIGHT);
+	
+	// Draw the other things
+	drawPause();
+	drawTimer();
+	drawScore();
+}
+
+function drawPause() {
+			
+	const BAR_WIDTH = PAUSE_BUTTON_WIDTH/2 - PAUSE_BUTTON_GAP/2;
+			
+	context.globalAlpha = 1;
+	context.fillStyle = "white";
+	context.fillRect(PAUSE_BUTTON_X, PAUSE_BUTTON_Y, BAR_WIDTH, PAUSE_BUTTON_HEIGHT);
+	
+	context.fillRect(PAUSE_BUTTON_X + BAR_WIDTH + PAUSE_BUTTON_GAP/2, 
+					 PAUSE_BUTTON_Y, 
+					 BAR_WIDTH, 
+					 PAUSE_BUTTON_HEIGHT);	
 }
 
 function drawTimer() {
 	
-	var spacing = 20;
+	const SPACING = 20;
 	
 	context.globalAlpha = 1;
 	context.fillStyle = "white";
@@ -73,29 +99,30 @@ function drawTimer() {
 	context.fillText("Time left", MENU_BAR_HORIZONTAL_MARGIN, MENU_BAR_VERTICAL_MARGIN);
 		 
 	context.font = "20px Kenzo";
-	context.fillText(timeLeft + " sec", MENU_BAR_HORIZONTAL_MARGIN, MENU_BAR_VERTICAL_MARGIN + spacing);
+	context.fillText(timeLeft + " sec", MENU_BAR_HORIZONTAL_MARGIN, MENU_BAR_VERTICAL_MARGIN + SPACING);
 }
 
 function drawScore() {
 	
-	var spacing = 20;
+	const SPACING = 20;
+	const SCORE_STRING = "SCORE";
+	const SCORE_AT_DRAW = score.toString();
+	
 	var scoreTextWidth;
 	var pointsTextWidth;
-	var scoreString = "SCORE";
-	var scoreAtDraw = score.toString();
-	
+
 	// Draw SCORE
 	context.globalAlpha = 1;
 	context.fillStyle = "white"; 
 	context.font = "15px Kenzo";
-	scoreTextWidth = context.measureText(scoreString).width;
+	scoreTextWidth = context.measureText(SCORE_STRING).width;
 
-	context.fillText(scoreString, CANVAS_WIDTH - MENU_BAR_HORIZONTAL_MARGIN - scoreTextWidth, MENU_BAR_VERTICAL_MARGIN);	
+	context.fillText(SCORE_STRING, CANVAS_WIDTH - MENU_BAR_HORIZONTAL_MARGIN - scoreTextWidth, MENU_BAR_VERTICAL_MARGIN);	
 
 	// Draw POINTS
 	context.font = "20px Kenzo";
-	pointsTextWidth = context.measureText(scoreAtDraw).width;
-	context.fillText(scoreAtDraw, CANVAS_WIDTH - MENU_BAR_HORIZONTAL_MARGIN - pointsTextWidth, MENU_BAR_VERTICAL_MARGIN + spacing);	
+	pointsTextWidth = context.measureText(SCORE_AT_DRAW).width;
+	context.fillText(SCORE_AT_DRAW, CANVAS_WIDTH - MENU_BAR_HORIZONTAL_MARGIN - pointsTextWidth, MENU_BAR_VERTICAL_MARGIN + SPACING);	
 }
 
 function playGame() {
