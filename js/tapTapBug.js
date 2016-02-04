@@ -78,9 +78,6 @@ function startGame() {
 	context = canvas.getContext("2d");
 	initFruits();
 	beginTimers();
-
-	//var audio = document.getElementById("gameMusic");
-    //audio.remove(audio);
 }
 
 function selectLevel(number) {
@@ -274,8 +271,6 @@ function moveBugs() {
 			xTranslation = bugs[i][1] * Math.sin(distanceAngle);
 			yTranslation = bugs[i][1] * Math.cos(distanceAngle);
 		}
-
-		
 
 		if (y2 < y1) {
 			yTranslation = -yTranslation;
