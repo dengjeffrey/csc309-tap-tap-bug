@@ -15,17 +15,22 @@ var bugs = [];
 var fruits = ["apple", "banana", "watermelon", "orange", "grape"];
 var Level = 1;
 
+//////////////////////////////////////////
 // UI
-var CANVAS_WIDTH = 400;
-var CANVAS_HEIGHT = 600; 
-var MENU_BAR_HEIGHT = 50;
+//////////////////////////////////////////
+const CANVAS_WIDTH = 400;
+const CANVAS_HEIGHT = 600; 
+
+// Menu
+const MENU_BAR_HEIGHT = 50;
+const MENU_BAR_HORIZONTAL_MARGIN = 10;
+const MENU_BAR_VERTICAL_MARGIN = 20;
 
 // Colours
-
-var orange = "#F57336";
-var red = "#C22121";
-var black = "#161616";
-var blue = "#577DC3";
+const ORANGE = "#F57336";
+const RED = "#C22121";
+const BLACK = "#161616";
+const BLUE = "#577DC3";
 
 function startGame() {
     document.getElementById("main").innerHTML = "<canvas id='game' width = '" + CANVAS_WIDTH + "' height = '" + (CANVAS_HEIGHT + MENU_BAR_HEIGHT) + "'>  </canvas> <audio id ='gameMusic' controls autoplay loop hidden: true;> <source src='audio/PlantsVsZombies.mp3' type='audio/mpeg'> </audio>";
@@ -45,21 +50,52 @@ function draw() {
 	context.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT + MENU_BAR_HEIGHT);
 	drawMenu();
 	drawTimer();
+	drawScore();
+
 	moveBugs();
 	spawnFruits();
 }
 
 function drawMenu () {
 	context.globalAlpha = 1;
-	context.fillStyle = blue; 
+	context.fillStyle = BLUE; 
 	context.fillRect(0, 0, CANVAS_WIDTH, MENU_BAR_HEIGHT);
 }
 
 function drawTimer() {
+	
+	var spacing = 20;
+	
+	context.globalAlpha = 1;
+	context.fillStyle = "white";
+	
+	context.font = "15px Kenzo";
+	context.fillText("Time left", MENU_BAR_HORIZONTAL_MARGIN, MENU_BAR_VERTICAL_MARGIN);
+		 
+	context.font = "20px Kenzo";
+	context.fillText(timeLeft + " sec", MENU_BAR_HORIZONTAL_MARGIN, MENU_BAR_VERTICAL_MARGIN + spacing);
+}
+
+function drawScore() {
+	
+	var spacing = 20;
+	var scoreTextWidth;
+	var pointsTextWidth;
+	var scoreString = "SCORE";
+	var scoreAtDraw = score.toString();
+	
+	// Draw SCORE
 	context.globalAlpha = 1;
 	context.fillStyle = "white"; 
-	context.font = "18px Kenzo";
-	context.fillText(timeLeft, 10, 35);
+	context.font = "15px Kenzo";
+	scoreTextWidth = context.measureText(scoreString).width;
+
+	context.fillText(scoreString, CANVAS_WIDTH - MENU_BAR_HORIZONTAL_MARGIN - scoreTextWidth, MENU_BAR_VERTICAL_MARGIN);	
+
+	// Draw POINTS
+	context.font = "20px Kenzo";
+	pointsTextWidth = context.measureText(scoreAtDraw).width;
+	context.fillText(scoreAtDraw, CANVAS_WIDTH - MENU_BAR_HORIZONTAL_MARGIN - pointsTextWidth, MENU_BAR_VERTICAL_MARGIN + spacing);	
 }
 
 function playGame() {
