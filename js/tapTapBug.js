@@ -24,6 +24,7 @@ var addBugTimer;
 // Button states
 var isPaused = Boolean(false);
 var isMute = Boolean(false);
+var beatLevel = Boolean(false);
 
 //////////////////////////////////////////
 // UI
@@ -158,6 +159,27 @@ function drawPausedOverlay() {
 	drawMute();
 }
 
+function drawNextLevel() {
+	context.globalAlpha = 0.8;
+	context.fillStyle = "black";
+	context.fillRect(0, MENU_BAR_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT);
+	
+	context.globalAlpha = 1;	
+	context.fillStyle = "white";
+	context.font = "60px Kenzo";
+
+}
+
+function drawGameOver() {
+	context.globalAlpha = 0.8;
+	context.fillStyle = "black";
+	context.fillRect(0, MENU_BAR_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT);
+	
+	context.globalAlpha = 1;	
+	context.fillStyle = "white";
+	context.font = "60px Kenzo";
+}
+
 function drawMute() {
 	context.globalAlpha = 1;	
 	context.fillStyle="white";
@@ -250,52 +272,63 @@ function moveBugs() {
 	for (var i = 0; i < bugs.length; i++) {
 		var xTranslation;
 		var yTranslation;
-		var fruitNumber = shortestDistance(i);
-		//Initialize the four approximate corners of the Bug
-		var bL = bugs[i][3];
-		var bT = bugs[i][4];
-		var bR = bugs[i][5];
-		var bB = bugs[i][6];
 
-		//Approximate the four corners of the Fruit
-		var fL = fruits[fruitNumber][1] + 6;
-		var fR = fL + 24;
-		var fT = fruits[fruitNumber][2];
-		var fB = fT + 30;
+		if (fruits.length > 0) {
+			var fruitNumber = shortestDistance(i);
 
-		if (bL == fL) {
-			xTranslation = 0;
-			yTranslation = bugs[i][1];
-		} else if (bT == fT) {
-			yTranslation = 0;
-			xTranslation = bugs[i][1];
+			//Initialize the four approximate corners of the Bug
+			var bL = bugs[i][3];
+			var bT = bugs[i][4];
+			var bR = bugs[i][5];
+			var bB = bugs[i][6];
 
-			if (fL < bL) {
-				xTranslation = -xTranslation;
+			//Approximate the four corners of the Fruit
+			var fL = fruits[fruitNumber][1] + 6;
+			var fR = fL + 24;
+			var fT = fruits[fruitNumber][2];
+			var fB = fT + 30;
+
+			if (bL == fL) {
+				xTranslation = 0;
+				yTranslation = bugs[i][1];
+			} else if (bT == fT) {
+				yTranslation = 0;
+				xTranslation = bugs[i][1];
+
+				if (fL < bL) {
+					xTranslation = -xTranslation;
+				}
+			} else {
+				var distanceAngle = Math.atan((fL-bL)/(fT-bT));
+				xTranslation = bugs[i][1] * Math.sin(distanceAngle);
+				yTranslation = bugs[i][1] * Math.cos(distanceAngle);
+			}
+
+			if (fT < bT) {
+				yTranslation = -yTranslation;
+			}
+
+			bugs[i][3] = bugs[i][3] + xTranslation;
+			bugs[i][4] = bugs[i][4] + yTranslation;
+
+			makeBug(context, bugs[i][0], 0.5, bugs[i][3], bugs[i][4]);
+
+			//Check if any of the corners of the bug is inside one of the corners of the fruit
+			if ((bL <= fR && bL >= fL) || (bR >= fL && bR <= fR)) {
+				if ((bT >= fT && bT <= fB) || (bB >= fT && bB <= fB)) {
+					fruits.splice(fruitNumber, 1);
+				}
 			}
 		} else {
-			var distanceAngle = Math.atan((fL-bL)/(fT-bT));
-			xTranslation = bugs[i][1] * Math.sin(distanceAngle);
-			yTranslation = bugs[i][1] * Math.cos(distanceAngle);
-		}
-
-		if (fT < bT) {
-			yTranslation = -yTranslation;
-		}
-
-		bugs[i][3] = bugs[i][3] + xTranslation;
-		bugs[i][4] = bugs[i][4] + yTranslation;
-
-		makeBug(context, bugs[i][0], 0.5, bugs[i][3], bugs[i][4]);
-
-		/** 
-		*Check if any of the bugs are touching any of the fruits. If any of the points of the bug is in between 
-		**/
-
-		if ((bL <= fR && bL >= fL) || (bR >= fL && bR <= fR)) {
-			if ((bT >= fT && bT <= fB) || (bB >= fT && bB <= fB)) {
-				fruits.splice(fruitNumber, 1);
+			window.clearTimeout(mainGameTimer);
+			window.clearTimeout(addBugTimer);
+			window.clearTimeout(countdownTimer);
+			if (Level == 1) {
+				drawNextLevel();
+			} else {
+				drawGameOver();
 			}
+			
 		}
 	}
 }
