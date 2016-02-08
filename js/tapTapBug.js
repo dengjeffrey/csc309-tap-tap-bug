@@ -14,7 +14,7 @@ var orangeSpeed = 60;
 
 var bugs = [];
 var fruits = ["apple", "banana", "watermelon", "orange", "grape"];
-var Level = 1;
+var level = 1;
 
 // Timers
 var countdownTimer;
@@ -60,6 +60,12 @@ const SMALL_MUTEBAR_HEIGHT = MUTE_TOTAL_HEIGHT * 0.4;
 const LARGE_MUTEBAR_HEIGHT = MUTE_TOTAL_HEIGHT * 0.8;
 const MUTE_BAR_WIDTH = 2;
 const MUTE_BAR_SPACING = 3;
+
+// Game over
+const GAME_OVER_TEXT = "Game over"
+
+// Next Level
+const LEVEL_TEXT = "Level"
 
 // Colours
 const ORANGE = "#F57336";
@@ -323,7 +329,7 @@ function moveBugs() {
 			window.clearTimeout(mainGameTimer);
 			window.clearTimeout(addBugTimer);
 			window.clearTimeout(countdownTimer);
-			if (Level == 1) {
+			if (level == 1) {
 				drawNextLevel();
 			} else {
 				drawGameOver();
