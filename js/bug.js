@@ -1,4 +1,4 @@
-const HEIGHT = 50;
+const HEIGHT = 40;
 const HEAD_PROPORTION = 0.35;
 const BODY_PROPORTION = 0.3;
 const END_PROPORTION = 0.4;
