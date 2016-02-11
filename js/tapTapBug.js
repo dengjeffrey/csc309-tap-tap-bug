@@ -6,6 +6,8 @@ const FPS = 60;
 
 var timeLeft = 60;
 var topScore;
+var level1TopScore = 0;
+var level2TopScore = 0;
 var score = 0;
 
 var blackSpeed = 150;
@@ -13,7 +15,8 @@ var redSpeed = 75;
 var orangeSpeed = 60; 
 
 var bugs = [];
-var fruits = ["apple", "banana", "watermelon", "orange", "grape"];
+var fruitList = ["apple", "banana", "watermelon", "orange", "grape"];
+var fruits = [];
 var level = 1;
 
 // Timers
@@ -89,10 +92,16 @@ function startGame() {
 
 function selectLevel(number) {
 	if (number == 2)  {
+		topScore = level2TopScore;
+		document.getElementById("content-score").innerHTML = "<h4>HIGH SCORE</h4> <p>" + topScore + "</p>";
+		level = 2;
 		blackSpeed = 200;
 		redSpeed = 100;
 		orangeSpeed = 80;
 	} else {
+		topScore = level1TopScore;
+		document.getElementById("content-score").innerHTML = "<h4>HIGH SCORE</h4> <p>" + topScore + "</p>";
+		level = 1;
 		blackSpeed = 150;
 		redSpeed = 75;
 		orangeSpeed = 60; 
@@ -163,17 +172,6 @@ function drawPausedOverlay() {
 	context.fillText(PAUSE_TEXT, (CANVAS_WIDTH - pauseTextWidth)/2, CANVAS_HEIGHT/2);
 	
 	drawMute();
-}
-
-function drawNextLevel() {
-	context.globalAlpha = 0.8;
-	context.fillStyle = "black";
-	context.fillRect(0, MENU_BAR_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT);
-	
-	context.globalAlpha = 1;	
-	context.fillStyle = "white";
-	context.font = "60px Kenzo";
-
 }
 
 function drawGameOver() {
@@ -316,6 +314,8 @@ function moveBugs() {
 
 			bugs[i][3] = bugs[i][3] + xTranslation;
 			bugs[i][4] = bugs[i][4] + yTranslation;
+			bugs[i][5] = bugs[i][5] + 24;
+			bugs[i][6] = bugs[i][6] + 79;
 
 			makeBug(context, bugs[i][0], 0.5, bugs[i][3], bugs[i][4]);
 
@@ -326,11 +326,8 @@ function moveBugs() {
 				}
 			}
 		} else {
-			window.clearTimeout(mainGameTimer);
-			window.clearTimeout(addBugTimer);
-			window.clearTimeout(countdownTimer);
 			if (level == 1) {
-				drawNextLevel();
+				loadLevel2();
 			} else {
 				drawGameOver();
 			}
@@ -400,11 +397,10 @@ function initFruits() {
 	for (var i = 0; i < 5; i++) {
 		xPosition = randomize(10, 350);
 		yPosition = randomize(150, 570);
-		var image = document.getElementById(fruits[i]);
+		var image = document.getElementById(fruitList[i]);
 
 		//Replace fruit name in array with array detailing image name, alpha/visibility, xPosition and yPosition
-		fruits[i] = [image, xPosition, yPosition];
-		
+		fruits.push([image, xPosition, yPosition]);
 	}
 }
 
@@ -423,15 +419,29 @@ function runTimer() {
 * On load, html page will fetch the stored score
 **/
 function loadScore() {
-	topScore = Number(localStorage.getItem("score"));
+	level1TopScore = Number(localStorage.getItem("level1TopScore"));
+	level2TopScore = Number(localStorage.getItem("level2TopScore"));
+	if (level2TopScore == null) {
+		level2TopScore = 0;
+	}
+	if (level == 1) {
+		topScore = level1TopScore;
+	} else {
+		topScore = level2TopScore;
+	}
 	document.getElementById("content-score").innerHTML = "<h4>HIGH SCORE</h4> <p>" + topScore + "</p>"
 }
 
 function setScore() {
-	if (score > topScore) {
-		localStorage.setItem("score", score);
+	if (level == 1) {
+		if (score > level1TopScore) {
+			localStorage.setItem("level1TopScore", score);
+		}
+	} else {
+		if (score > level2TopScore) {
+			localStorage.setItem("level2TopScore", score);
+		}
 	}
-	
 }
 
 /* Given a rectangle, and a point. True if point resides in rectangle */
@@ -461,6 +471,10 @@ function mousePositionInCanvas(mouseX, mouseY) {
 function mouseDidPressDown(event) {
 	
 	var mousePosition = mousePositionInCanvas(event.clientX, event.clientY);
+
+	for (var i; i < bugs.length; i++) {
+
+	} 
 
 	if(isPointInRect(PAUSE_BUTTON_X, PAUSE_BUTTON_Y, PAUSE_BUTTON_WIDTH, PAUSE_BUTTON_HEIGHT, mousePosition.x, mousePosition.y)) {
 		
@@ -492,6 +506,20 @@ function mouseDidPressDown(event) {
 	
 }
 
+function loadLevel2() {
+	selectLevel(2);
+	window.clearTimeout(mainGameTimer);
+	window.clearTimeout(addBugTimer);
+	window.clearTimeout(countdownTimer);
+	bugs = [];
+	fruits = [];
+	var fruits = ["apple", "banana", "watermelon", "orange", "grape"];
+	initFruits();
+	score = 0;
+	timeLeft = 60;
+	beginTimers();
+
+}
 function checkCollision(x1, y1, x2, y2) {
 
 
