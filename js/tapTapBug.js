@@ -107,6 +107,14 @@ function selectLevel(number) {
 		orangeSpeed = 60; 
 	}
 }
+
+function nextLevel() {
+		topScore = level2TopScore;
+		level = 2;
+		blackSpeed = 200;
+		redSpeed = 100;
+		orangeSpeed = 80;
+}
 /* Drawings */
 
 // Draw loop
@@ -507,7 +515,7 @@ function mouseDidPressDown(event) {
 }
 
 function loadLevel2() {
-	selectLevel(2);
+	nextLevel();
 	window.clearTimeout(mainGameTimer);
 	window.clearTimeout(addBugTimer);
 	window.clearTimeout(countdownTimer);
