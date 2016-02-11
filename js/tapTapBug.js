@@ -20,7 +20,7 @@ var fruitList = ["apple", "banana", "watermelon", "orange", "grape"];
 var fruits = [];
 var level = 1;
 
-var squashRadius = 100;
+var squashRadius = 30;
 // Timers
 var countdownTimer;
 var mainGameTimer;
@@ -485,7 +485,7 @@ function mouseDidPressDown(event) {
 	for (var i = 0; i < bugs.length; i++) {
 		var a = mousePosition.x - (bugs[i][3] + (WIDTH / 2));
 		var b = mousePosition.y - (bugs[i][4] + (HEIGHT / 2));
-		var c = a * a + b * b;
+		var c = Math.sqrt(a * a + b * b);
 		if (c <= squashRadius) {
 			score += bugs[i][2];
 			bugs.splice(i, 1);
