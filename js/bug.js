@@ -122,7 +122,7 @@ function makeBug(ctx, colour, visibility, x, y) {
 	ctx.stroke();
 	// White overlay
 	ctx.beginPath();
-	ctx.globalAlpha = visibility;
+	ctx.globalAlpha = 1 - visibility;
 	ctx.fillStyle = "white"
 	ctx.fillRect(x, y, WIDTH, HEIGHT);
 }
