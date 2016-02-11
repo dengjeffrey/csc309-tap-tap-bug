@@ -324,8 +324,8 @@ function moveBugs() {
 
 			bugs[i][3] = bugs[i][3] + xTranslation;
 			bugs[i][4] = bugs[i][4] + yTranslation;
-			bugs[i][5] = bugs[i][5] + 24;
-			bugs[i][6] = bugs[i][6] + 79;
+			bugs[i][5] = bugs[i][3] + (HEIGHT * 0.65);
+			bugs[i][6] = bugs[i][4] + (HEIGHT);
 
 			makeBug(context, bugs[i][0], 0.5, bugs[i][3], bugs[i][4]);
 
@@ -540,7 +540,6 @@ function loadLevel2() {
 	window.clearTimeout(countdownTimer);
 	bugs = [];
 	fruits = [];
-	var fruits = ["apple", "banana", "watermelon", "orange", "grape"];
 	initFruits();
 	score = 0;
 	timeLeft = 60;
