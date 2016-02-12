@@ -19,6 +19,8 @@ var fruitList = ["apple", "banana", "watermelon", "orange", "grape"];
 var fruits = [];
 var level = 1;
 
+var levelDidChange = 0;
+
 // Timers
 var countdownTimer;
 var mainGameTimer;
@@ -65,10 +67,17 @@ const MUTE_BAR_WIDTH = 2;
 const MUTE_BAR_SPACING = 3;
 
 // Game over
-const GAME_OVER_TEXT = "Game over"
+const GAME_OVER_TEXT = "Game over";
+const RETRY_TEXT = "Retry";
+
+var retryButton;
+
+
+const EXIT_TEXT = "Exit";
 
 // Next Level
-const LEVEL_TEXT = "Level"
+const LEVEL_TEXT = "Level";
+var nextLevelLabelAnimation;
 
 // Colours
 const ORANGE = "#F57336";
@@ -107,15 +116,29 @@ function selectLevel(number) {
 		orangeSpeed = 60; 
 	}
 }
+
+function button(x, y, height, width) {
+	this.x = x;
+	this.y = y;
+	this.height = height;
+	this.width = width; 
+}
+
 /* Drawings */
+// Callback when window refreshes
 
 // Draw loop
 function draw() {
+	
 	context.clearRect(0,0,CANVAS_WIDTH, CANVAS_HEIGHT + MENU_BAR_HEIGHT);
 	
 	drawMenu();
 	moveBugs();
 	spawnFruits();
+	
+	if (levelDidChange == 1 && nextLevelLabelAnimation) {
+		nextLevelLabelAnimation.update();
+	}
 }
 
 function drawMenu () {
@@ -174,6 +197,44 @@ function drawPausedOverlay() {
 	drawMute();
 }
 
+function drawNextLevel() {
+	/*
+	context.globalAlpha = 0.8;
+	context.fillStyle = "black";
+	context.fillRect(0, MENU_BAR_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT);
+	*/
+	var currentAlpha = 1;
+	var alphaChange = 0.2;
+	var currentLevelText = LEVEL_TEXT.concat(" " + level);
+
+	levelDidChange = 1;
+	
+	context.fillStyle = "black";
+	context.font = "60px Kenzo";
+	
+	var levelUpTextWidth = context.measureText(currentLevelText).width;
+	
+	this.update = function() {
+		
+		if (currentAlpha - alphaChange > 0) {
+			currentAlpha -= alphaChange;			
+		} else {
+			currentAlpha = 0;
+			levelDidChange = 0;
+		}
+		
+		context.globalAlpha = currentAlpha;	
+		context.fillStyle = "white";
+		context.font = "60px Kenzo";
+		
+		context.fillText(currentLevelText, (CANVAS_WIDTH - levelUpTextWidth)/2, CANVAS_HEIGHT/2);		
+	}
+	
+	update();
+	
+	return this;
+}
+
 function drawGameOver() {
 	context.globalAlpha = 0.8;
 	context.fillStyle = "black";
@@ -182,6 +243,17 @@ function drawGameOver() {
 	context.globalAlpha = 1;	
 	context.fillStyle = "white";
 	context.font = "60px Kenzo";
+	
+	var gameOverTextWidth = context.measureText(GAME_OVER_TEXT).width;
+	context.fillText(GAME_OVER_TEXT, (CANVAS_WIDTH - gameOverTextWidth)/2, CANVAS_HEIGHT/2);
+	
+	var retryTextWidth = context.measureText(RETRY_TEXT).width;
+	context.fillText(RETRY_TEXT, (CANVAS_WIDTH - gameOverTextWidth)/2, CANVAS_HEIGHT/2 + 30);
+	
+	var exitTextWidth = context.measureText(EXIT_TEXT).width;
+	context.fillText(EXIT_TEXT, (CANVAS_WIDTH - gameOverTextWidth)/2, CANVAS_HEIGHT/2 + 24);
+	
+	retryButton = new button((CANVAS_WIDTH - gameOverTextWidth)/2, CANVAS_HEIGHT/2 + 30, context.measureText(RETRY_TEXT).width, 60);
 }
 
 function drawMute() {
@@ -331,7 +403,6 @@ function moveBugs() {
 			} else {
 				drawGameOver();
 			}
-			
 		}
 	}
 }
@@ -519,6 +590,8 @@ function loadLevel2() {
 	timeLeft = 60;
 	beginTimers();
 
+	//nextLevelLabelAnimation = new drawNextLevel();
+
 }
 function checkCollision(x1, y1, x2, y2) {
 
@@ -529,5 +602,6 @@ function checkCollision(x1, y1, x2, y2) {
 function mouseDidRelease(event) {
 	
 }
+
 
 
