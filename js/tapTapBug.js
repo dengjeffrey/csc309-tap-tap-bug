@@ -9,6 +9,7 @@ var topScore;
 var level1TopScore = 0;
 var level2TopScore = 0;
 var score = 0;
+var lost = Boolean(false);
 
 var blackSpeed = 150;
 var redSpeed = 75;
@@ -19,6 +20,7 @@ var fruitList = ["apple", "banana", "watermelon", "orange", "grape"];
 var fruits = [];
 var level = 1;
 
+var squashRadius = 30;
 var levelDidChange = 0;
 
 // Timers
@@ -117,6 +119,13 @@ function selectLevel(number) {
 	}
 }
 
+function nextLevel() {
+		topScore = level2TopScore;
+		level = 2;
+		blackSpeed = 200;
+		redSpeed = 100;
+		orangeSpeed = 80;
+}
 function button(x, y, height, width) {
 	this.x = x;
 	this.y = y;
@@ -386,8 +395,8 @@ function moveBugs() {
 
 			bugs[i][3] = bugs[i][3] + xTranslation;
 			bugs[i][4] = bugs[i][4] + yTranslation;
-			bugs[i][5] = bugs[i][5] + 24;
-			bugs[i][6] = bugs[i][6] + 79;
+			bugs[i][5] = bugs[i][3] + (HEIGHT * 0.65);
+			bugs[i][6] = bugs[i][4] + (HEIGHT);
 
 			makeBug(context, bugs[i][0], 0.5, bugs[i][3], bugs[i][4]);
 
@@ -398,11 +407,8 @@ function moveBugs() {
 				}
 			}
 		} else {
-			if (level == 1) {
-				loadLevel2();
-			} else {
-				drawGameOver();
-			}
+			lost = true;
+			checkGameOver();
 		}
 	}
 }
@@ -433,11 +439,11 @@ function addBug() {
 		speed = orangeSpeed/FPS;
 	}
 
+	var WIDTH = HEIGHT * 0.65;
 	//Make an Array for the bug which has: colour, speed, points, x position, y position, right Limit, bottom Limit
-	bugs.push([colourOfAnt, speed, points, whereToSpawn, 50, whereToSpawn + 24, 50 + 79]);
+	bugs.push([colourOfAnt, speed, points, whereToSpawn, 50, whereToSpawn + WIDTH, 50 + HEIGHT]);
 	//Cookie Testing:
-	score += 1;
-	setScore();
+	
 }
 
 
@@ -483,6 +489,10 @@ function spawnFruits() {
 }
 
 function runTimer() {
+	checkGameOver();
+	if (timeLeft == 0) {
+		loadLevel2();
+	}
 	timeLeft--;
 }
 
@@ -540,11 +550,18 @@ function mousePositionInCanvas(mouseX, mouseY) {
 
 /* Delegate Event listeners */
 function mouseDidPressDown(event) {
-	
+	var WIDTH = HEIGHT * 0.65;
 	var mousePosition = mousePositionInCanvas(event.clientX, event.clientY);
-
-	for (var i; i < bugs.length; i++) {
-
+	for (var i = 0; i < bugs.length; i++) {
+		var a = mousePosition.x - (bugs[i][3] + (WIDTH / 2));
+		var b = mousePosition.y - (bugs[i][4] + (HEIGHT / 2));
+		var c = Math.sqrt(a * a + b * b);
+		if (c <= squashRadius) {
+			score += bugs[i][2];
+			bugs.splice(i, 1);
+			i--;
+			setScore();
+		}
 	} 
 
 	if(isPointInRect(PAUSE_BUTTON_X, PAUSE_BUTTON_Y, PAUSE_BUTTON_WIDTH, PAUSE_BUTTON_HEIGHT, mousePosition.x, mousePosition.y)) {
@@ -577,14 +594,22 @@ function mouseDidPressDown(event) {
 	
 }
 
+function checkGameOver() {
+	if (level == 2 && timeLeft == 0 || lost == true) {
+		window.clearTimeout(mainGameTimer);
+		window.clearTimeout(addBugTimer);
+		window.clearTimeout(countdownTimer);
+		drawGameOver();
+	}
+}
 function loadLevel2() {
-	selectLevel(2);
+	level = 2;
+	nextLevel();
 	window.clearTimeout(mainGameTimer);
 	window.clearTimeout(addBugTimer);
 	window.clearTimeout(countdownTimer);
 	bugs = [];
 	fruits = [];
-	var fruits = ["apple", "banana", "watermelon", "orange", "grape"];
 	initFruits();
 	score = 0;
 	timeLeft = 60;
@@ -593,11 +618,6 @@ function loadLevel2() {
 	//nextLevelLabelAnimation = new drawNextLevel();
 
 }
-function checkCollision(x1, y1, x2, y2) {
-
-
-}
-
 
 function mouseDidRelease(event) {
 	
