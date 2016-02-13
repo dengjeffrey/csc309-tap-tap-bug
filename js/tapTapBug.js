@@ -17,6 +17,7 @@ var redSpeed = 75;
 var orangeSpeed = 60; 
 
 var bugs = [];
+var deadBugs = [];
 var fruitList = ["apple", "banana", "watermelon", "orange", "grape"];
 var fruits = [];
 var level = 1;
@@ -173,6 +174,10 @@ function draw() {
 	drawMenu();
 	moveBugs();
 	spawnFruits();
+	
+	if (deadBugs.length > 0) {
+		drawDeadBugs();
+	}
 }
 
 function drawMenu () {
@@ -395,6 +400,31 @@ function pauseGame() {
 	drawPausedOverlay();
 }
 
+function drawDeadBugs() {
+	
+	const ALPHA_DECREASE_INTERVAL = 0.05;
+	var newDeadBugs = [];
+	
+	for (var i = 0; i < deadBugs.length; i ++) {
+	
+		var bug = deadBugs[i];	
+		
+		// Bug has not yet finished fading, then we fetch old bug details and decrease transparency
+		if (bug.visibility - ALPHA_DECREASE_INTERVAL> 0) {
+			
+			var newVisibility = bug.visibility - ALPHA_DECREASE_INTERVAL;
+			
+			// Draw dead bug, and decrease the alpah
+			var newDeadBug = new makeBug(bug.ctx, bug.colour, newVisibility, bug.x, bug.y);
+			
+			// store for later animation
+			newDeadBugs.push(newDeadBug);
+		} 		
+	}
+	
+	deadBugs = newDeadBugs;
+}
+
 function moveBugs() {
 	for (var i = 0; i < bugs.length; i++) {
 		var xTranslation;
@@ -440,7 +470,7 @@ function moveBugs() {
 			bugs[i][5] = bugs[i][3] + (HEIGHT * 0.65);
 			bugs[i][6] = bugs[i][4] + (HEIGHT);
 
-			makeBug(context, bugs[i][0], 0.5, bugs[i][3], bugs[i][4]);
+			makeBug(context, bugs[i][0], 1, bugs[i][3], bugs[i][4]);
 
 			//Check if any of the corners of the bug is inside one of the corners of the fruit
 			if ((bL <= fR && bL >= fL) || (bR >= fL && bR <= fR)) {
@@ -603,11 +633,16 @@ function mousePositionInCanvas(mouseX, mouseY) {
 function mouseDidPressDown(event) {
 	var WIDTH = HEIGHT * 0.65;
 	var mousePosition = mousePositionInCanvas(event.clientX, event.clientY);
+	
+	// Check Bug collision
 	for (var i = 0; i < bugs.length; i++) {
 		var a = mousePosition.x - (bugs[i][3] + (WIDTH / 2));
 		var b = mousePosition.y - (bugs[i][4] + (HEIGHT / 2));
 		var c = Math.sqrt(a * a + b * b);
 		if (c <= squashRadius) {
+			
+			deadBugs.push(new makeBug(context, bugs[i][0], 1, bugs[i][3], bugs[i][4]));
+			
 			score += bugs[i][2];
 			bugs.splice(i, 1);
 			i--;

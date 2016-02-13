@@ -32,7 +32,13 @@ function makeBug(ctx, colour, visibility, x, y) {
 	var headRadius = (HEIGHT * HEAD_PROPORTION / 2);
 	var middleRadius = (HEIGHT * BODY_PROPORTION / 2);
 	var endRadius = (HEIGHT * END_PROPORTION / 2);
-
+	
+	this.visibility = visibility;
+	this.x = x;
+	this.y = y;
+	this.ctx = ctx;
+	this.colour = colour;
+	
 	ctx.globalAlpha = 1;
 	// Bottom
 	ctx.beginPath();
