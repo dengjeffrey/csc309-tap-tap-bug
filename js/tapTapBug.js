@@ -545,6 +545,7 @@ function initFruits() {
 
 	for (var i = 0; i < 5; i++) {
 		xPosition = randomize(10, 350);
+		// The food should not appear within the top 20% of the table
 		yPosition = randomize(CANVAS_HEIGHT * 0.2 + MENU_BAR_HEIGHT, 570);
 		var image = document.getElementById(fruitList[i]);
 
