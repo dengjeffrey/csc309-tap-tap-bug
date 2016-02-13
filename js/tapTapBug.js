@@ -545,7 +545,7 @@ function initFruits() {
 
 	for (var i = 0; i < 5; i++) {
 		xPosition = randomize(10, 350);
-		yPosition = randomize(150, 570);
+		yPosition = randomize(CANVAS_HEIGHT * 0.2 + MENU_BAR_HEIGHT, 570);
 		var image = document.getElementById(fruitList[i]);
 
 		//Replace fruit name in array with array detailing image name, alpha/visibility, xPosition and yPosition
