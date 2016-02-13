@@ -250,7 +250,6 @@ function drawNextLevelLabel(completionBlock) {
 	var levelUpTextWidth = context.measureText(currentLevelText).width;
 	
 	this.update = function() {
-					console.log("Called");
 		context.clearRect(0, MENU_BAR_HEIGHT,CANVAS_WIDTH, CANVAS_HEIGHT + MENU_BAR_HEIGHT);
 
 		if (currentAlpha - alphaChange > 0) {
@@ -263,15 +262,10 @@ function drawNextLevelLabel(completionBlock) {
 		} else {
 			currentAlpha = 0;
 			levelDidChange = false;
-			console.log("Done");
 			completionBlock();
 		}
 	}
-	
-	//this.update();
-	
-	//this.timer = setInterval(this.update, 1000/FPS);
-	
+		
 	return this;
 }
 
