@@ -283,14 +283,6 @@ function drawGameOver() {
 	var gameOverTextWidth = context.measureText(GAME_OVER_TEXT).width;
 	context.fillText(GAME_OVER_TEXT, (CANVAS_WIDTH - gameOverTextWidth)/2, CANVAS_HEIGHT/2);
 	
-	/*
-	var retryTextWidth = context.measureText(RETRY_TEXT).width;
-	context.fillText(RETRY_TEXT, (CANVAS_WIDTH - gameOverTextWidth)/2, CANVAS_HEIGHT/2 + 30);
-	
-	var exitTextWidth = context.measureText(EXIT_TEXT).width;
-	context.fillText(EXIT_TEXT, (CANVAS_WIDTH - gameOverTextWidth)/2, CANVAS_HEIGHT/2 + 24);
-	*/
-	
 	context.font = "40px Kenzo";
 	
 	// Retry
@@ -315,7 +307,6 @@ function drawGameOver() {
 	
 	context.strokeStyle = "white";
 	context.strokeRect(exitButton.xPosition, exitButton.yPosition, exitButton.buttonWidth, exitButton.buttonHeight);
-	
 }
 
 function drawMute() {
@@ -589,8 +580,8 @@ function isPointInRect(rectX, rectY, rectWidth, rectHeight, pointX, pointY) {
 	}
 }
 
+/*  Given a button, and the mouse point check if pressed */
 function wasButtonPressed(buttonPressed, pointX, pointY) {
-	
 	return isPointInRect(buttonPressed.xPosition, 
 	buttonPressed.yPosition, 
 	buttonPressed.buttonWidth, 
@@ -656,16 +647,11 @@ function mouseDidPressDown(event) {
 	// Game over buttons
 	// Retry
 	else if (lost == true && wasButtonPressed(retryButton, mousePosition.x, mousePosition.y)) {
-		console.log("Reset Pressed");	
 		restartGame();
 	}
 	else if (lost ==true && wasButtonPressed(exitButton, mousePosition.x, mousePosition.y)) {
-				console.log("exit Pressed");	
 		endGame();
 	}
-	
-	
-	
 }
 
 function checkGameOver() {
