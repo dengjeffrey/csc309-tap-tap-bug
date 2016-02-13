@@ -22,12 +22,14 @@ var fruits = [];
 var level = 1;
 
 var squashRadius = 30;
-var levelDidChange = 0;
+var levelDidChange = Boolean(false);
 
 // Timers
 var countdownTimer;
 var mainGameTimer;
 var addBugTimer;
+
+var animationTimer;
 
 // Button states
 var isPaused = Boolean(false);
@@ -171,10 +173,6 @@ function draw() {
 	drawMenu();
 	moveBugs();
 	spawnFruits();
-	
-	if (levelDidChange == 1 && nextLevelLabelAnimation) {
-		nextLevelLabelAnimation.update();
-	}
 }
 
 function drawMenu () {
@@ -233,14 +231,15 @@ function drawPausedOverlay() {
 	drawMute();
 }
 
-function drawNextLevel() {
-	/*
-	context.globalAlpha = 0.8;
-	context.fillStyle = "black";
+function drawNextLevelLabel(completionBlock) {
+	
+	context.globalAlpha = 1.0;
+	context.fillStyle = "white";
 	context.fillRect(0, MENU_BAR_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT);
-	*/
-	var currentAlpha = 1;
-	var alphaChange = 0.2;
+	
+	var original
+	var currentAlpha = 2;
+	var alphaChange = 0.02;
 	var currentLevelText = LEVEL_TEXT.concat(" " + level);
 
 	levelDidChange = 1;
@@ -251,22 +250,27 @@ function drawNextLevel() {
 	var levelUpTextWidth = context.measureText(currentLevelText).width;
 	
 	this.update = function() {
-		
+					console.log("Called");
+		context.clearRect(0, MENU_BAR_HEIGHT,CANVAS_WIDTH, CANVAS_HEIGHT + MENU_BAR_HEIGHT);
+
 		if (currentAlpha - alphaChange > 0) {
 			currentAlpha -= alphaChange;			
+			context.globalAlpha = currentAlpha;	
+			context.fillStyle = "black";
+			context.font = "60px Kenzo";
+			console.log("Animating");
+			context.fillText(currentLevelText, (CANVAS_WIDTH - levelUpTextWidth)/2, CANVAS_HEIGHT/2);		
 		} else {
 			currentAlpha = 0;
-			levelDidChange = 0;
+			levelDidChange = false;
+			console.log("Done");
+			completionBlock();
 		}
-		
-		context.globalAlpha = currentAlpha;	
-		context.fillStyle = "white";
-		context.font = "60px Kenzo";
-		
-		context.fillText(currentLevelText, (CANVAS_WIDTH - levelUpTextWidth)/2, CANVAS_HEIGHT/2);		
 	}
 	
-	update();
+	//this.update();
+	
+	//this.timer = setInterval(this.update, 1000/FPS);
 	
 	return this;
 }
@@ -389,9 +393,9 @@ function beginTimers() {
 }
 
 function pauseGame() {
-	window.clearTimeout(mainGameTimer);
-	window.clearTimeout(addBugTimer);
-	window.clearTimeout(countdownTimer);
+	window.clearInterval(mainGameTimer);
+	window.clearInterval(addBugTimer);
+	window.clearInterval(countdownTimer);
 	
 	drawMenu ();
 	drawPausedOverlay();
@@ -649,34 +653,40 @@ function mouseDidPressDown(event) {
 	else if (lost == true && wasButtonPressed(retryButton, mousePosition.x, mousePosition.y)) {
 		restartGame();
 	}
-	else if (lost ==true && wasButtonPressed(exitButton, mousePosition.x, mousePosition.y)) {
+	else if (lost == true && wasButtonPressed(exitButton, mousePosition.x, mousePosition.y)) {
 		endGame();
 	}
 }
 
 function checkGameOver() {
 	if (level == 2 && timeLeft == 0 || lost == true) {
-		window.clearTimeout(mainGameTimer);
-		window.clearTimeout(addBugTimer);
-		window.clearTimeout(countdownTimer);
+		window.clearInterval(mainGameTimer);
+		window.clearInterval(addBugTimer);
+		window.clearInterval(countdownTimer);
 		drawGameOver();
 	}
 }
 function loadLevel2() {
+	
 	level = 2;
 	nextLevel();
-	window.clearTimeout(mainGameTimer);
-	window.clearTimeout(addBugTimer);
-	window.clearTimeout(countdownTimer);
-	bugs = [];
-	fruits = [];
-	initFruits();
-	score = 0;
-	timeLeft = 60;
-	beginTimers();
+	window.clearInterval(mainGameTimer);
+	window.clearInterval(addBugTimer);
+	window.clearInterval(countdownTimer);
 
-	//nextLevelLabelAnimation = new drawNextLevel();
-
+	
+	levelDidChange = true;
+	nextLevelLabelAnimation = new drawNextLevelLabel(function completion() {
+		window.clearInterval(animationTimer);
+		bugs = [];
+		fruits = [];
+		initFruits();
+		score = 0;
+		timeLeft = 60;
+		beginTimers();
+	});
+	
+	animationTimer = setInterval(nextLevelLabelAnimation.update, 1000/FPS);
 }
 
 function mouseDidRelease(event) {
