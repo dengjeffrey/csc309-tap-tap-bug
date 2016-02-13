@@ -1,6 +1,7 @@
 var canvas = document.getElementById("game");
 var context = canvas.getContext("2d");
 const AUDIO_ELEMENT_ID = "gameMusic";
+const CANVAS_ELEMENT_ID = "game";
 
 const FPS = 60;
 
@@ -71,11 +72,10 @@ const MUTE_BAR_SPACING = 3;
 // Game over
 const GAME_OVER_TEXT = "Game over";
 const RETRY_TEXT = "Retry";
+const EXIT_TEXT = "Exit";
 
 var retryButton;
-
-
-const EXIT_TEXT = "Exit";
+var exitButton;
 
 // Next Level
 const LEVEL_TEXT = "Level";
@@ -87,9 +87,13 @@ const RED = "#C22121";
 const BLACK = "#161616";
 const BLUE = "#577DC3";
 
+// Menu Buttons
+const BUTTON_WIDTH = 250;
+const BUTTON_HEIGHT = 70;
+
 function startGame() {
-    document.getElementById("main").innerHTML = "<canvas id='game' width = '" + CANVAS_WIDTH + "' height = '" + (CANVAS_HEIGHT + MENU_BAR_HEIGHT) + "'>  </canvas> <audio id ='" + AUDIO_ELEMENT_ID + "' controls autoplay loop hidden: true;> <source src='audio/PlantsVsZombies.mp3' type='audio/mpeg'> </audio>";
-	canvas = document.getElementById("game");
+    document.getElementById("main").innerHTML = "<canvas id='"+ CANVAS_ELEMENT_ID + "' width = '" + CANVAS_WIDTH + "' height = '" + (CANVAS_HEIGHT + MENU_BAR_HEIGHT) + "'>  </canvas> <audio id ='" + AUDIO_ELEMENT_ID + "' controls autoplay loop hidden: true;> <source src='audio/PlantsVsZombies.mp3' type='audio/mpeg'> </audio>";
+	canvas = document.getElementById(CANVAS_ELEMENT_ID);
 	
 	// Add Mouse down listener
 	canvas.addEventListener("mousedown", mouseDidPressDown, false);
@@ -97,6 +101,29 @@ function startGame() {
 
 	
 	context = canvas.getContext("2d");
+	initFruits();
+	beginTimers();
+}
+
+function endGame() {
+	location.reload();
+}
+
+function restartGame() {
+	lost = false;
+	
+	level = 1;
+	timeLeft = 60;
+	level1TopScore = 0;
+	level2TopScore = 0;
+	score = 0;
+	lost = Boolean(false);
+	
+	blackSpeed = 150;
+	redSpeed = 75;
+	orangeSpeed = 60; 
+	
+	bugs = [];
 	initFruits();
 	beginTimers();
 }
@@ -126,11 +153,11 @@ function nextLevel() {
 		redSpeed = 100;
 		orangeSpeed = 80;
 }
-function button(x, y, height, width) {
-	this.x = x;
-	this.y = y;
-	this.height = height;
-	this.width = width; 
+function button(x, y, width, height) {
+	this.xPosition = x;
+	this.yPosition = y;
+	this.buttonHeight = height;
+	this.buttonWidth = width; 
 }
 
 /* Drawings */
@@ -256,13 +283,39 @@ function drawGameOver() {
 	var gameOverTextWidth = context.measureText(GAME_OVER_TEXT).width;
 	context.fillText(GAME_OVER_TEXT, (CANVAS_WIDTH - gameOverTextWidth)/2, CANVAS_HEIGHT/2);
 	
+	/*
 	var retryTextWidth = context.measureText(RETRY_TEXT).width;
 	context.fillText(RETRY_TEXT, (CANVAS_WIDTH - gameOverTextWidth)/2, CANVAS_HEIGHT/2 + 30);
 	
 	var exitTextWidth = context.measureText(EXIT_TEXT).width;
 	context.fillText(EXIT_TEXT, (CANVAS_WIDTH - gameOverTextWidth)/2, CANVAS_HEIGHT/2 + 24);
+	*/
 	
-	retryButton = new button((CANVAS_WIDTH - gameOverTextWidth)/2, CANVAS_HEIGHT/2 + 30, context.measureText(RETRY_TEXT).width, 60);
+	context.font = "40px Kenzo";
+	
+	// Retry
+	const BUTTON_SPACING = 20;
+	const TEXT_PADDING_TOP = 50;
+	
+	var retryTextWidth = context.measureText(RETRY_TEXT).width;
+	var retryButtonY = CANVAS_HEIGHT/2 + 50;
+	
+	retryButton = new button((CANVAS_WIDTH - BUTTON_WIDTH)/2, retryButtonY, BUTTON_WIDTH, BUTTON_HEIGHT);
+	context.fillText(RETRY_TEXT, (CANVAS_WIDTH - retryTextWidth)/2, retryButtonY + TEXT_PADDING_TOP);
+	
+	context.strokeStyle = "white";
+	context.strokeRect(retryButton.xPosition, retryButton.yPosition, retryButton.buttonWidth, retryButton.buttonHeight);
+	
+	// Exit
+	var exitTextWidth = context.measureText(EXIT_TEXT).width;
+	var exitButtonY = retryButtonY + BUTTON_HEIGHT + BUTTON_SPACING;
+	
+	exitButton = new button((CANVAS_WIDTH - BUTTON_WIDTH)/2, exitButtonY, BUTTON_WIDTH, BUTTON_HEIGHT);
+	context.fillText(EXIT_TEXT, (CANVAS_WIDTH - exitTextWidth)/2, exitButtonY + TEXT_PADDING_TOP);
+	
+	context.strokeStyle = "white";
+	context.strokeRect(exitButton.xPosition, exitButton.yPosition, exitButton.buttonWidth, exitButton.buttonHeight);
+	
 }
 
 function drawMute() {
@@ -534,7 +587,16 @@ function isPointInRect(rectX, rectY, rectWidth, rectHeight, pointX, pointY) {
 	} else {
 		return Boolean(false);
 	}
+}
+
+function wasButtonPressed(buttonPressed, pointX, pointY) {
 	
+	return isPointInRect(buttonPressed.xPosition, 
+	buttonPressed.yPosition, 
+	buttonPressed.buttonWidth, 
+	buttonPressed.buttonHeight, 
+	pointX, 
+	pointY);	
 }
 
 /* Pass the event.clientX and event.clientY from a mouse press event other wise pass two x and y coordinates to convert them to x and y relative to the canvas */
@@ -564,7 +626,8 @@ function mouseDidPressDown(event) {
 		}
 	} 
 
-	if(isPointInRect(PAUSE_BUTTON_X, PAUSE_BUTTON_Y, PAUSE_BUTTON_WIDTH, PAUSE_BUTTON_HEIGHT, mousePosition.x, mousePosition.y)) {
+	// Pause
+	if (!lost && isPointInRect(PAUSE_BUTTON_X, PAUSE_BUTTON_Y, PAUSE_BUTTON_WIDTH, PAUSE_BUTTON_HEIGHT, mousePosition.x, mousePosition.y)) {
 		
 		if (isPaused) {
 			isPaused = Boolean(false);
@@ -574,9 +637,8 @@ function mouseDidPressDown(event) {
 			pauseGame();
 		}
 	}
-	
-	if(isPaused && isPointInRect(MUTE_BUTTON_X, MUTE_BUTTON_Y, MUTE_TOTAL_WIDTH, MUTE_TOTAL_HEIGHT, mousePosition.x, mousePosition.y)) {
-		console.log("PRESS");
+	// Mute
+	else if (isPaused && isPointInRect(MUTE_BUTTON_X, MUTE_BUTTON_Y, MUTE_TOTAL_WIDTH, MUTE_TOTAL_HEIGHT, mousePosition.x, mousePosition.y)) {
 		if (isMute) {
 			isMute = Boolean(false);
 			//audio.muted = false;
@@ -591,6 +653,18 @@ function mouseDidPressDown(event) {
 			drawMute();
 		}
 	}
+	// Game over buttons
+	// Retry
+	else if (lost == true && wasButtonPressed(retryButton, mousePosition.x, mousePosition.y)) {
+		console.log("Reset Pressed");	
+		restartGame();
+	}
+	else if (lost ==true && wasButtonPressed(exitButton, mousePosition.x, mousePosition.y)) {
+				console.log("exit Pressed");	
+		endGame();
+	}
+	
+	
 	
 }
 
