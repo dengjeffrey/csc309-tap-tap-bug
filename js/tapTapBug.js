@@ -124,8 +124,6 @@ function restartGame() {
 	
 	level = 1;
 	timeLeft = 60;
-	level1TopScore = 0;
-	level2TopScore = 0;
 	score = 0;
 	lost = Boolean(false);
 	
