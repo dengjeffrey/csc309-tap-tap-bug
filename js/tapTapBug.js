@@ -156,6 +156,7 @@ function nextLevel() {
 		redSpeed = 100;
 		orangeSpeed = 80;
 }
+
 function button(x, y, width, height) {
 	this.xPosition = x;
 	this.yPosition = y;
@@ -440,8 +441,8 @@ function moveBugs() {
 			var bB = bugs[i][6];
 
 			//Approximate the four corners of the Fruit
-			var fL = fruits[fruitNumber][1] + 6;
-			var fR = fL + 24;
+			var fL = fruits[fruitNumber][1];
+			var fR = fL + 30;
 			var fT = fruits[fruitNumber][2];
 			var fB = fT + 30;
 
@@ -451,7 +452,6 @@ function moveBugs() {
 			} else if (bT == fT) {
 				yTranslation = 0;
 				xTranslation = bugs[i][1];
-
 				if (fL < bL) {
 					xTranslation = -xTranslation;
 				}
@@ -459,10 +459,37 @@ function moveBugs() {
 				var distanceAngle = Math.atan((fL-bL)/(fT-bT));
 				xTranslation = bugs[i][1] * Math.sin(distanceAngle);
 				yTranslation = bugs[i][1] * Math.cos(distanceAngle);
-			}
-
-			if (fT < bT) {
-				yTranslation = -yTranslation;
+				for (var firstBug = 0; firstBug < bugs.length; firstBug++) {
+					for (var secondBug = 0; secondBug < bugs.length; secondBug++) {
+						//Check all the bugs and see if any overlap, if so, consider if they are the same, if not, and they are overlapping, change the angle slightly. Continue to do this until none of the bugs are overlapping
+						var WIDTH = HEIGHT * 0.65;
+						var a = (bugs[firstBug][3] + (WIDTH / 2)) - (bugs[secondBug][3] + (WIDTH / 2));
+						var b = (bugs[firstBug][4] + (HEIGHT / 2)) - (bugs[secondBug][4] + (HEIGHT / 2));
+						var c = Math.sqrt(a * a + b * b);
+						if (c < 15) {
+							console.log(c);
+							if (firstBug == secondBug) {
+								//Do Nothing
+							} else if (bugs[firstBug][1] > bugs[secondBug][1]) {
+								//Also do nothing
+							} else if (bugs[firstBug][1] < bugs[secondBug][1]) {
+								//Increase the xTranslation slightly to move the ant to the right
+								xTranslation += 10;
+							} else if (bugs[firstBug][1] == bugs[secondBug][1]) {
+								//Increase or decrease the angle
+								var angle = Math.floor(Math.random());
+								if (angle == 0) {
+									xTranslation -= 10;
+								} else {
+									xTranslation += 10;
+								}
+							}
+						}
+					}
+				}
+				if (fT < bT) {
+					yTranslation = -yTranslation;
+				}
 			}
 
 			bugs[i][3] = bugs[i][3] + xTranslation;
@@ -473,16 +500,25 @@ function moveBugs() {
 			makeBug(context, bugs[i][0], 1, bugs[i][3], bugs[i][4]);
 
 			//Check if any of the corners of the bug is inside one of the corners of the fruit
-			if ((bL <= fR && bL >= fL) || (bR >= fL && bR <= fR)) {
-				if ((bT >= fT && bT <= fB) || (bB >= fT && bB <= fB)) {
+			if (collide(bT, bB, bL, bR, fT, fB, fL, fR)) {
 					fruits.splice(fruitNumber, 1);
-				}
 			}
 		} else {
 			lost = true;
 			checkGameOver();
 		}
 	}
+}
+
+//Check if any of the corners of object1 is inside one of the corners of the object2
+function collide(o1T, o1B, o1L, o1R, o2T, o2B, o2L, o2R) {
+	if ((o1L <= o2R && o1L >= o2L) || (o1R >= o2L && o1R <= o2R)) {
+		if ((o1T >= o2T && o1T <= o2B) || (o1B >= o2T && o1B <= o2B)) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 function randomize(lowest, highest) {
@@ -549,7 +585,7 @@ function initFruits() {
 		yPosition = randomize(CANVAS_HEIGHT * 0.2 + MENU_BAR_HEIGHT, 570);
 		var image = document.getElementById(fruitList[i]);
 
-		//Replace fruit name in array with array detailing image name, alpha/visibility, xPosition and yPosition
+		//Replace fruit name in array with array detailing image name, xPosition and yPosition
 		fruits.push([image, xPosition, yPosition]);
 	}
 }
