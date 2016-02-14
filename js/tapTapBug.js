@@ -477,6 +477,7 @@ function drawDeadBugs() {
 	deadBugs = newDeadBugs;
 }
 
+//Check and move every bug in a smooth manner towards fruits. If overlapping, move the slower bug slightly to the right or left as necessary.
 function moveBugs() {
 	for (var i = 0; i < bugs.length; i++) {
 		var xTranslation;
@@ -510,31 +511,39 @@ function moveBugs() {
 				var distanceAngle = Math.atan((fL-bL)/(fT-bT));
 				xTranslation = bugs[i][1] * Math.sin(distanceAngle);
 				yTranslation = bugs[i][1] * Math.cos(distanceAngle);
-				for (var firstBug = 0; firstBug < bugs.length; firstBug++) {
-					for (var secondBug = 0; secondBug < bugs.length; secondBug++) {
-						//Check all the bugs and see if any overlap, if so, consider if they are the same, if not, and they are overlapping, change the angle slightly. Continue to do this until none of the bugs are overlapping
-						var WIDTH = HEIGHT * 0.65;
-						var a = (bugs[firstBug][3] + (WIDTH / 2)) - (bugs[secondBug][3] + (WIDTH / 2));
-						var b = (bugs[firstBug][4] + (HEIGHT / 2)) - (bugs[secondBug][4] + (HEIGHT / 2));
-						var c = Math.sqrt(a * a + b * b);
-						if (c < 15) {
-							if (firstBug == secondBug) {
-								//Do Nothing
-							} else if (bugs[firstBug][1] > bugs[secondBug][1]) {
-								//Also do nothing
-							} else if (bugs[firstBug][1] < bugs[secondBug][1]) {
-								//Increase the xTranslation slightly to move the ant to the right
-								xTranslation += 5;
-							} else if (bugs[firstBug][1] == bugs[secondBug][1]) {
-								//Increase or decrease the angle
-								var angle = Math.floor(Math.random());
-								if (angle == 0) {
-									xTranslation -= 5;
-								} else {
-									xTranslation += 5;
-								}
+				for (var secondBug = 0; secondBug < bugs.length; secondBug++) {
+					//Check all the bugs and see if any overlap, if so, consider if they are the same, if not, and they are overlapping, change the angle slightly. Continue to do this until none of the bugs are overlapping
+					var WIDTH = HEIGHT * 0.65;
+					var a = (bugs[i][3] + (WIDTH / 2)) - (bugs[secondBug][3] + (WIDTH / 2));
+					var b = (bugs[i][4] + (HEIGHT / 2)) - (bugs[secondBug][4] + (HEIGHT / 2));
+					var c = Math.sqrt(a * a + b * b);
+					if (c < 20) {
+						if (i == secondBug) {
+							//Do Nothing
+						} else if (bugs[i][1] > bugs[secondBug][1]) {
+							//Also do nothing
+						} else if (bugs[i][1] < bugs[secondBug][1]) {
+							//Increase the xTranslation slightly to move the ant to the right
+							if (bugs[i][3] < bugs[secondBug][3]) {
+								xTranslation -= 2;
+							} else {
+								xTranslation += 2;
 							}
-							bugs[i][3] = bugs[i][3] + xTranslation;
+							
+						} else if (bugs[i][1] == bugs[secondBug][1]) {
+							//Increase or decrease the angle
+							var angle = Math.floor(Math.random());
+							if (angle == 0) {
+								xTranslation -= 2;
+							} else {
+								xTranslation += 2;
+							}
+						}
+
+						if (fR < bL && xTranslation > 0) {
+							xTranslation = -xTranslation;
+						} else if (bR < fL && xTranslation < 0) {
+							xTranslation = -xTranslation;
 						}
 					}
 				}
@@ -542,8 +551,9 @@ function moveBugs() {
 					yTranslation = -yTranslation;
 				}
 			}
-			bugs[i][4] = bugs[i][4] + yTranslation;
+			bugs[i][3] = bugs[i][3] + xTranslation;
 			bugs[i][5] = bugs[i][3] + (HEIGHT * 0.65);
+			bugs[i][4] = bugs[i][4] + yTranslation;
 			bugs[i][6] = bugs[i][4] + (HEIGHT);
 
 			makeBug(context, bugs[i][0], 1, bugs[i][3], bugs[i][4]);
