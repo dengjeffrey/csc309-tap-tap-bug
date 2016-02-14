@@ -142,17 +142,9 @@ function selectLevel(number) {
 	if (number == 2)  {
 		topScore = level2TopScore;
 		document.getElementById("content-score").innerHTML = "<h4>HIGH SCORE</h4> <p>" + topScore + "</p>";
-		level = 2;
-		blackSpeed = 200;
-		redSpeed = 100;
-		orangeSpeed = 80;
 	} else {
 		topScore = level1TopScore;
 		document.getElementById("content-score").innerHTML = "<h4>HIGH SCORE</h4> <p>" + topScore + "</p>";
-		level = 1;
-		blackSpeed = 150;
-		redSpeed = 75;
-		orangeSpeed = 60; 
 	}
 }
 
