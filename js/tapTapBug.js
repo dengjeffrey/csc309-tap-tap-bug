@@ -474,16 +474,17 @@ function moveBugs() {
 								//Also do nothing
 							} else if (bugs[firstBug][1] < bugs[secondBug][1]) {
 								//Increase the xTranslation slightly to move the ant to the right
-								xTranslation += 10;
+								xTranslation += 5;
 							} else if (bugs[firstBug][1] == bugs[secondBug][1]) {
 								//Increase or decrease the angle
 								var angle = Math.floor(Math.random());
 								if (angle == 0) {
-									xTranslation -= 10;
+									xTranslation -= 5;
 								} else {
-									xTranslation += 10;
+									xTranslation += 5;
 								}
 							}
+							bugs[i][3] = bugs[i][3] + xTranslation;
 						}
 					}
 				}
@@ -491,8 +492,6 @@ function moveBugs() {
 					yTranslation = -yTranslation;
 				}
 			}
-
-			bugs[i][3] = bugs[i][3] + xTranslation;
 			bugs[i][4] = bugs[i][4] + yTranslation;
 			bugs[i][5] = bugs[i][3] + (HEIGHT * 0.65);
 			bugs[i][6] = bugs[i][4] + (HEIGHT);
