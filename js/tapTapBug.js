@@ -7,6 +7,8 @@ const FPS = 60;
 
 var timeLeft = 60;
 var topScore;
+var level1Score = 0;
+var level2Score = 0;
 var level1TopScore = 0;
 var level2TopScore = 0;
 var score = 0;
@@ -83,7 +85,7 @@ var exitButton;
 var okButton;
 
 // High Scores
-const HIGH_SCORE_TEXT = "High Scores";
+const HIGH_SCORE_TEXT = "Your Scores";
 const OK_TEXT = "Ok";
 
 // Next Level
@@ -339,14 +341,14 @@ function drawGameOverWithScore() {
 	const GAME_OVER_Y = CANVAS_HEIGHT/2 + 50
 	
 	var highScoreTextWidth = context.measureText(HIGH_SCORE_TEXT).width;
-	var level1TextWidth = context.measureText("Level 1 : " + level1TopScore).width;
-	var level2TextWidth = context.measureText("Level 2 : " + level2TopScore).width;
+	var level1TextWidth = context.measureText("Level 1 : " + level1Score).width;
+	var level2TextWidth = context.measureText("Level 2 : " + level2Score).width;
 	
 	context.fillText(HIGH_SCORE_TEXT, (CANVAS_WIDTH - highScoreTextWidth)/2, GAME_OVER_Y + TEXT_SPACING_TOP);
 	
 	context.font = "30px Kenzo";
-	context.fillText("Level 1 : " + level1TopScore, (CANVAS_WIDTH - level1TextWidth)/2, GAME_OVER_Y + TEXT_PADDING_TOP + SMALL_TEXT_SPACING_TOP);
-	context.fillText("Level 2 : " + level2TopScore, (CANVAS_WIDTH - level2TextWidth)/2, GAME_OVER_Y + TEXT_PADDING_TOP + 2 * SMALL_TEXT_SPACING_TOP);
+	context.fillText("Level 1 : " + level1Score, (CANVAS_WIDTH - level1TextWidth)/2, GAME_OVER_Y + TEXT_PADDING_TOP + SMALL_TEXT_SPACING_TOP);
+	context.fillText("Level 2 : " + level2Score, (CANVAS_WIDTH - level2TextWidth)/2, GAME_OVER_Y + TEXT_PADDING_TOP + 2 * SMALL_TEXT_SPACING_TOP);
 
 	var levelTextEndY = GAME_OVER_Y + TEXT_SPACING_TOP + 2 * SMALL_TEXT_SPACING_TOP;
 
@@ -780,6 +782,11 @@ function mouseDidPressDown(event) {
 			deadBugs.push(new makeBug(context, bugs[i][0], 1, bugs[i][3], bugs[i][4]));
 			
 			score += bugs[i][2];
+			if (level == 1) {
+				level1Score = score;
+			} else {
+				level2Score = score;
+			}
 			bugs.splice(i, 1);
 			i--;
 			setScore();
