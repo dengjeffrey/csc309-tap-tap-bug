@@ -11,6 +11,7 @@ var level1TopScore = 0;
 var level2TopScore = 0;
 var score = 0;
 var lost = Boolean(false);
+var won = Boolean(false);
 
 var blackSpeed = 150;
 var redSpeed = 75;
@@ -79,6 +80,11 @@ const EXIT_TEXT = "Exit";
 
 var retryButton;
 var exitButton;
+var okButton;
+
+// High Scores
+const HIGH_SCORE_TEXT = "High Scores";
+const OK_TEXT = "Ok";
 
 // Next Level
 const LEVEL_TEXT = "Level";
@@ -114,6 +120,7 @@ function endGame() {
 
 function restartGame() {
 	lost = false;
+	won = false;
 	
 	level = 1;
 	timeLeft = 60;
@@ -263,7 +270,6 @@ function drawNextLevelLabel(completionBlock) {
 			context.globalAlpha = currentAlpha;	
 			context.fillStyle = "black";
 			context.font = "60px Kenzo";
-			console.log("Animating");
 			context.fillText(currentLevelText, (CANVAS_WIDTH - levelUpTextWidth)/2, CANVAS_HEIGHT/2);		
 		} else {
 			currentAlpha = 0;
@@ -311,6 +317,51 @@ function drawGameOver() {
 	
 	context.strokeStyle = "white";
 	context.strokeRect(exitButton.xPosition, exitButton.yPosition, exitButton.buttonWidth, exitButton.buttonHeight);
+}
+
+function drawGameOverWithScore() {
+	context.globalAlpha = 0.8;
+	context.fillStyle = "black";
+	context.fillRect(0, MENU_BAR_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT);
+	
+	context.globalAlpha = 1;	
+	context.fillStyle = "white";
+	context.font = "60px Kenzo";
+	
+	var gameOverTextWidth = context.measureText(GAME_OVER_TEXT).width;
+	context.fillText(GAME_OVER_TEXT, (CANVAS_WIDTH - gameOverTextWidth)/2, CANVAS_HEIGHT/2);
+	
+	context.font = "40px Kenzo";
+	
+	// Level 1 Score
+	const TEXT_PADDING_TOP = 50;
+	const TEXT_SPACING_TOP = 40;
+	const SMALL_TEXT_SPACING_TOP = 40;
+
+	const GAME_OVER_Y = CANVAS_HEIGHT/2 + 50
+	
+	var highScoreTextWidth = context.measureText(HIGH_SCORE_TEXT).width;
+	var level1TextWidth = context.measureText("Level 1 : " + level1TopScore).width;
+	var level2TextWidth = context.measureText("Level 2 : " + level2TopScore).width;
+	
+	context.fillText(HIGH_SCORE_TEXT, (CANVAS_WIDTH - highScoreTextWidth)/2, GAME_OVER_Y + TEXT_SPACING_TOP);
+	
+	context.font = "30px Kenzo";
+	context.fillText("Level 1 : " + level1TopScore, (CANVAS_WIDTH - level1TextWidth)/2, GAME_OVER_Y + TEXT_PADDING_TOP + SMALL_TEXT_SPACING_TOP);
+	context.fillText("Level 2 : " + level2TopScore, (CANVAS_WIDTH - level2TextWidth)/2, GAME_OVER_Y + TEXT_PADDING_TOP + 2 * SMALL_TEXT_SPACING_TOP);
+
+	var levelTextEndY = GAME_OVER_Y + TEXT_SPACING_TOP + 2 * SMALL_TEXT_SPACING_TOP;
+
+	// OK button
+	const BUTTON_SPACING = 10;
+	var okTextWidth = context.measureText(OK_TEXT).width;
+	var okButtonY = levelTextEndY + BUTTON_HEIGHT + BUTTON_SPACING;
+	
+	okButton = new button((CANVAS_WIDTH - BUTTON_WIDTH)/2, okButtonY, BUTTON_WIDTH, BUTTON_HEIGHT);
+	context.fillText(OK_TEXT, (CANVAS_WIDTH - okTextWidth)/2, okButtonY + TEXT_PADDING_TOP);
+	
+	context.strokeStyle = "white";
+	context.strokeRect(okButton.xPosition, okButton.yPosition, okButton.buttonWidth, okButton.buttonHeight);
 }
 
 function drawMute() {
@@ -467,7 +518,6 @@ function moveBugs() {
 						var b = (bugs[firstBug][4] + (HEIGHT / 2)) - (bugs[secondBug][4] + (HEIGHT / 2));
 						var c = Math.sqrt(a * a + b * b);
 						if (c < 15) {
-							console.log(c);
 							if (firstBug == secondBug) {
 								//Do Nothing
 							} else if (bugs[firstBug][1] > bugs[secondBug][1]) {
@@ -597,8 +647,8 @@ function spawnFruits() {
 }
 
 function runTimer() {
-	checkGameOver();
-	if (timeLeft == 0) {
+	
+	if (timeLeft == 0 && checkGameOver() == false) {
 		loadLevel2();
 	}
 	timeLeft--;
@@ -625,10 +675,12 @@ function setScore() {
 	if (level == 1) {
 		if (score > level1TopScore) {
 			localStorage.setItem("level1TopScore", score);
+			level1TopScore = score;
 		}
 	} else {
 		if (score > level2TopScore) {
 			localStorage.setItem("level2TopScore", score);
+			level2TopScore = score;
 		}
 	}
 }
@@ -669,22 +721,7 @@ function mousePositionInCanvas(mouseX, mouseY) {
 function mouseDidPressDown(event) {
 	var WIDTH = HEIGHT * 0.65;
 	var mousePosition = mousePositionInCanvas(event.clientX, event.clientY);
-	
-	// Check Bug collision
-	for (var i = 0; i < bugs.length; i++) {
-		var a = mousePosition.x - (bugs[i][3] + (WIDTH / 2));
-		var b = mousePosition.y - (bugs[i][4] + (HEIGHT / 2));
-		var c = Math.sqrt(a * a + b * b);
-		if (c <= squashRadius) {
-			
-			deadBugs.push(new makeBug(context, bugs[i][0], 1, bugs[i][3], bugs[i][4]));
-			
-			score += bugs[i][2];
-			bugs.splice(i, 1);
-			i--;
-			setScore();
-		}
-	} 
+
 
 	// Pause
 	if (!lost && isPointInRect(PAUSE_BUTTON_X, PAUSE_BUTTON_Y, PAUSE_BUTTON_WIDTH, PAUSE_BUTTON_HEIGHT, mousePosition.x, mousePosition.y)) {
@@ -721,25 +758,53 @@ function mouseDidPressDown(event) {
 	else if (lost == true && wasButtonPressed(exitButton, mousePosition.x, mousePosition.y)) {
 		endGame();
 	}
+	else if (won == true && wasButtonPressed(okButton, mousePosition.x, mousePosition.y)) {
+		endGame();
+	}
+		
+	// Check Bug collision
+	for (var i = 0; i < bugs.length; i++) {
+		var a = mousePosition.x - (bugs[i][3] + (WIDTH / 2));
+		var b = mousePosition.y - (bugs[i][4] + (HEIGHT / 2));
+		var c = Math.sqrt(a * a + b * b);
+		if (c <= squashRadius) {
+			
+			deadBugs.push(new makeBug(context, bugs[i][0], 1, bugs[i][3], bugs[i][4]));
+			
+			score += bugs[i][2];
+			bugs.splice(i, 1);
+			i--;
+			setScore();
+		}
+	} 
 }
 
 function checkGameOver() {
-	if (level == 2 && timeLeft == 0 || lost == true) {
+	if (lost == true) {
 		window.clearInterval(mainGameTimer);
 		window.clearInterval(addBugTimer);
 		window.clearInterval(countdownTimer);
 		drawGameOver();
+		return true;
 	}
+	else if (level == 2 && timeLeft <= 0) {
+		won = true;
+		window.clearInterval(mainGameTimer);
+		window.clearInterval(addBugTimer);
+		window.clearInterval(countdownTimer);
+		drawGameOverWithScore();	;
+		return true;
+	}
+	return false;
 }
+
 function loadLevel2() {
 	
-	level = 2;
 	nextLevel();
 	window.clearInterval(mainGameTimer);
 	window.clearInterval(addBugTimer);
 	window.clearInterval(countdownTimer);
 
-	
 	levelDidChange = true;
 	nextLevelLabelAnimation = new drawNextLevelLabel(function completion() {
 		window.clearInterval(animationTimer);
