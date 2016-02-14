@@ -101,7 +101,7 @@ const BUTTON_WIDTH = 250;
 const BUTTON_HEIGHT = 70;
 
 function startGame() {
-    document.getElementById("main").innerHTML = "<canvas id='"+ CANVAS_ELEMENT_ID + "' width = '" + CANVAS_WIDTH + "' height = '" + (CANVAS_HEIGHT + MENU_BAR_HEIGHT) + "'>  </canvas> <audio id ='" + AUDIO_ELEMENT_ID + "' controls autoplay loop hidden: true;> <source src='audio/PlantsVsZombies.mp3' type='audio/mpeg'> </audio>";
+    document.getElementById("main").innerHTML = "<canvas id='"+ CANVAS_ELEMENT_ID + "' width = '" + CANVAS_WIDTH + "' height = '" + (CANVAS_HEIGHT + MENU_BAR_HEIGHT) + "'>  </canvas> <audio id ='" + AUDIO_ELEMENT_ID + "' controls autoplay loop hidden: true;> <source src='audio/PlantsVsZombies.ogg' type='audio/mpeg'> </audio>";
 	canvas = document.getElementById(CANVAS_ELEMENT_ID);
 	
 	// Add Mouse down listener
